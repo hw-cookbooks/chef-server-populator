@@ -7,7 +7,7 @@ pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 node[:chef_server_populator][:clients].each do |client, pub_key|
   execute "create client: #{client}" do
-    command "#{knife_cmd} client create #{client} --admin #{knife_opts}"
+    command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
     not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
   end
   if(pub_key && File.directory?(node[:chef_server_populator][:base_path]))
