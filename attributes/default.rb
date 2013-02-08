@@ -5,3 +5,4 @@ default[:chef_server_populator][:user] = 'admin'
 default[:chef_server_populator][:pem] = '/etc/chef-server/admin.pem'
 default[:chef_server_populator][:databag] = nil
 default[:chef_server_populator][:databag_item] = nil
+default[:chef_server_populator][:install_chef_server_cookbook] = true

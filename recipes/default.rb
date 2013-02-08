@@ -43,4 +43,14 @@ else
       Chef::Log.warn 'Chef server populator failed to locate population data bag'
     end
   end
+  if(node[:chef_server_populator][:install_chef_server_cookbook])
+    execute "load nested chef-server cookbook" do
+      command "#{knife_cmd} cookbook upload chef-server #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
+      not_if do
+        output = %x{#{knife_cmd} cookbook show chef-server #{knife_opts}}.to_s
+        metadata = Chef::Metadata.new.from_file('/opt/chef-server/embedded/cookbooks/chef-server/metadata.rb')
+        output.split(' ').include?(metadata.version)
+      end
+    end
+  end
 end
