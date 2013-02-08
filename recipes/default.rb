@@ -1,3 +1,16 @@
+if(node[:chef_server_populator][:servername_override])
+  node.set[:chef_server][:nginx][:server_name] = node[:chef_server_populator][:servername_override]
+  node.set[:chef_server][:bookshelf][:vip] = node[:chef_server_populator][:servername_override]
+  node.set[:chef_server][:lb][:api_fqdn] = node[:chef_server_populator][:servername_override] 
+  node.set[:chef_server][:lb][:web_ui_fqdn] = node[:chef_server_populator][:servername_override] 
+else
+  node.set[:chef_server][:nginx][:server_name] = node[:fqdn]
+  node.set[:chef_server][:bookshelf][:vip] = node[:fqdn]
+  node.set[:chef_server][:lb][:api_fqdn] = node[:fqdn] 
+  node.set[:chef_server][:lb][:web_ui_fqdn] = node[:fqdn] 
+end
+
+include_recipe 'chef-server'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
@@ -43,12 +56,20 @@ else
       Chef::Log.warn 'Chef server populator failed to locate population data bag'
     end
   end
-  if(node[:chef_server_populator][:install_chef_server_cookbook])
+  if(node[:chef_server_populator][:install_chef_server_cookbooks])
     execute "load nested chef-server cookbook" do
       command "#{knife_cmd} cookbook upload chef-server #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
       not_if do
         output = %x{#{knife_cmd} cookbook show chef-server #{knife_opts}}.to_s
         metadata = Chef::Metadata.new.from_file('/opt/chef-server/embedded/cookbooks/chef-server/metadata.rb')
+        output.split(' ').include?(metadata.version)
+      end
+    end
+    execute "load chef-server-populator cookbook" do
+      command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o /var/chef/cookbooks"
+      not_if do
+        output = %x{#{knife_cmd} cookbook show chef-server-populator #{knife_opts}}.to_s
+        metadata = Chef::Metadata.new.from_file('/var/chef/cookbooks/chef-server-populator/metadata.rb')
         output.split(' ').include?(metadata.version)
       end
     end
