@@ -36,19 +36,28 @@ if(Chef::Config[:solo])
     end
   end
 else
-  if(node[:chef_server_populator][:databag] && node[:chef_server_populator][:databag_item])
+  if(node[:chef_server_populator][:databag])
     begin
-      bag = data_bag_item(node[:chef_server_populator][:databag], node[:chef_server_populator][:databag_item])
-      bag['clients'].each do |client, pub_key|
-        execute "create client: #{client}" do
-          command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
-          not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
-        end
-        if(pub_key)
-          execute "set public key for: #{client}" do
-            command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key}' where name = '#{client}'\""
-            user 'opscode-pgsql'
-            not_if "#{pg_cmd} -c \"select public_key from clients where name = '#{client}' and public_key = E'#{pub_key}'\" -tqa | grep #{client}"
+      data_bag(node[:chef_server_populator][:databag]).each do |item_id|
+        item = data_bag_item(node[:chef_server_populator][:databag], item_id)
+        client = item['id']
+        pub_key = item['client_key']
+        if(item['enabled'] == false)
+          execute "delete client: #{client}" do
+            command "#{knife_cmd} client delete #{client} --admin -d #{knife_opts}"
+            only_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+          end
+        else
+          execute "create client: #{client}" do
+            command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
+            not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+          end
+          if(pub_key)
+            execute "set public key for: #{client}" do
+              command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key}' where name = '#{client}'\""
+              user 'opscode-pgsql'
+              not_if "#{pg_cmd} -c \"select public_key from clients where name = '#{client}' and public_key = E'#{pub_key}'\" -tqa | grep #{client}"
+            end
           end
         end
       end

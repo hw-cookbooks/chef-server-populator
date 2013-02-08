@@ -21,17 +21,14 @@ When converging with chef-client:
 Applicable attributes:
 
 * `node[:chef_server_populator][:databag]` - name of the data bag
-* `node[:chef_server_populator][:databag_item]` - name of the data bag item
 
 Structure of the data bag item:
 
 ```json
 {
-  "id": "my_clients",
-  "clients": {
-    "client_x": "public key contents",
-    "client_y": "public key contents"
-  }
+  "id": "client_name",
+  "client_key": "public key contents",
+  "enabled": true
 }
 ```
 
