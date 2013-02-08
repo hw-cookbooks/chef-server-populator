@@ -62,7 +62,8 @@ if(node[:chef_server_populator][:install_chef_server_cookbooks])
     command "#{knife_cmd} cookbook upload chef-server #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
     not_if do
       output = %x{#{knife_cmd} cookbook show chef-server #{knife_opts}}.to_s
-      metadata = Chef::Cookbook::Metadata.new.from_file('/opt/chef-server/embedded/cookbooks/chef-server/metadata.rb')
+      metadata = Chef::Cookbook::Metadata.new
+      metadata.from_file('/opt/chef-server/embedded/cookbooks/chef-server/metadata.rb')
       output.split(' ').include?(metadata.version)
     end
   end
@@ -70,7 +71,8 @@ if(node[:chef_server_populator][:install_chef_server_cookbooks])
     command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o /var/chef/cookbooks"
     not_if do
       output = %x{#{knife_cmd} cookbook show chef-server-populator #{knife_opts}}.to_s
-      metadata = Chef::Cookbook::Metadata.new.from_file('/var/chef/cookbooks/chef-server-populator/metadata.rb')
+      metadata = Chef::Cookbook::Metadata.new
+      metadata.from_file('/var/chef/cookbooks/chef-server-populator/metadata.rb')
       output.split(' ').include?(metadata.version)
     end
   end
