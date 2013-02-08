@@ -67,6 +67,15 @@ if(node[:chef_server_populator][:install_chef_server_cookbooks])
       output.split(' ').include?(metadata.version)
     end
   end
+  execute "load nested runit cookbook" do
+    command "#{knife_cmd} cookbook upload runit #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
+    not_if do
+      output = %x{#{knife_cmd} cookbook show runit #{knife_opts}}.to_s
+      metadata = Chef::Cookbook::Metadata.new
+      metadata.from_file('/opt/chef-server/embedded/cookbooks/runit/metadata.rb')
+      output.split(' ').include?(metadata.version)
+    end
+  end
   execute "load chef-server-populator cookbook" do
     command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o /var/chef/cookbooks"
     not_if do
