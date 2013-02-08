@@ -58,22 +58,15 @@ else
   end
 end
 if(node[:chef_server_populator][:install_chef_server_cookbooks])
-  execute "load nested chef-server cookbook" do
-    command "#{knife_cmd} cookbook upload chef-server #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
-    not_if do
-      output = %x{#{knife_cmd} cookbook show chef-server #{knife_opts}}.to_s
-      metadata = Chef::Cookbook::Metadata.new
-      metadata.from_file('/opt/chef-server/embedded/cookbooks/chef-server/metadata.rb')
-      output.split(' ').include?(metadata.version)
-    end
-  end
-  execute "load nested runit cookbook" do
-    command "#{knife_cmd} cookbook upload runit #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
-    not_if do
-      output = %x{#{knife_cmd} cookbook show runit #{knife_opts}}.to_s
-      metadata = Chef::Cookbook::Metadata.new
-      metadata.from_file('/opt/chef-server/embedded/cookbooks/runit/metadata.rb')
-      output.split(' ').include?(metadata.version)
+  %w(runit chef-server).each do |nested_cookbook|
+    execute "load nested #{nested_cookbook} cookbook" do
+      command "#{knife_cmd} cookbook upload #{nested_cookbook} #{knife_opts} -o /opt/chef-server/embedded/cookbooks"
+      not_if do
+        output = %x{#{knife_cmd} cookbook show #{nested_cookbook} #{knife_opts}}.to_s
+        metadata = Chef::Cookbook::Metadata.new
+        metadata.from_file("/opt/chef-server/embedded/cookbooks/#{nested_cookbook}/metadata.rb")
+        output.split(' ').include?(metadata.version)
+      end
     end
   end
   execute "load chef-server-populator cookbook" do
