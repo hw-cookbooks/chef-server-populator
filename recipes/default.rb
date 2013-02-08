@@ -40,8 +40,10 @@ else
     begin
       data_bag(node[:chef_server_populator][:databag]).each do |item_id|
         item = data_bag_item(node[:chef_server_populator][:databag], item_id)
+        next unless item['chef_server']
         client = item['id']
-        pub_key = item['client_key']
+        pub_key = item['chef_server']['client_key']
+        enabled = item['chef_server']['enabled']
         if(item['enabled'] == false)
           execute "delete client: #{client}" do
             command "#{knife_cmd} client delete #{client} --admin -d #{knife_opts}"

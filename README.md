@@ -27,8 +27,10 @@ Structure of the data bag item:
 ```json
 {
   "id": "client_name",
-  "client_key": "public key contents",
-  "enabled": true
+  "chef_server": {
+    "client_key": "public key contents",
+    "enabled": true
+  }
 }
 ```
 
