@@ -35,6 +35,23 @@ Structure of the data bag item:
 }
 ```
 
+## Extras
+
+Need to use the IP address of the node for a bit, or another name  instead of 
+having `node[:fqdn]`?
+
+* `node[:chef_server_populator][:servername_override]`
+
+Want the actual chef-server cookbook for configuring chef-server installed so
+the chef-server can manage itself? Just flip the switch:
+
+* `node[:chef_server_populator][:install_chef_server_cookbooks]`
+
+## Examples
+
+Take a look in the `examples` directory for a basic bootstrap template that will
+build a new erchef server, using existing keys and client, and register itself.
+
 ## Info
 * Repository: https://github.com/hw-cookbooks/chef-server-populator
 * IRC: Freenode @ #heavywater
