@@ -58,7 +58,7 @@ echo "
     \"servername_override\": \"${IPADDR}\",
     \"base_path\": \"/tmp/chef-server-setup\"
   },
-  \"run_list\": [ \"recipe[chef-server-populator]\" ]
+  \"run_list\": [ \"recipe[chef-server-populator]\", \"recipe[chef-server]\" ]
 }
 "
 ) > /tmp/chef-server.json
