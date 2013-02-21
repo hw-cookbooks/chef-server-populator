@@ -34,7 +34,3 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
     end
   end
 end
-
-execute 'install chef-server-populator cookbook' do
-  command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o /var/chef/cookbooks"
-end
