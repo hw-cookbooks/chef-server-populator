@@ -41,10 +41,12 @@ having `node[:fqdn]`?
 
 * `node[:chef_server_populator][:servername_override]`
 
-Want the actual chef-server cookbook for configuring chef-server installed so
-the chef-server can manage itself? Just flip the switch:
+Keep chef server configured via chef client:
 
-* `node[:chef_server_populator][:install_chef_server_cookbooks]`
+* `node[:chef_server_populator][:chef_server]`
+
+If the hash is non-empty, it will write the chef-server `dna.json` and trigger a
+`reconfigure` when ever the attributes are updated.
 
 ## Examples
 
