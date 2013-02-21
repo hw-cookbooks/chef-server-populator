@@ -36,5 +36,5 @@ file '/opt/chef-server/embedded/cookbooks/dna.json' do
       :chef_server => node[:chef_server_populator][:chef_server].to_hash
     )
   )
-  notifies "execute[reconfigure chef server!]", :immediately
+  notifies :run, "execute[reconfigure chef server!]", :immediately
 end
