@@ -8,8 +8,8 @@ else
   node.set[:chef_server][:bookshelf][:vip] = node[:fqdn]
   node.set[:chef_server][:lb][:api_fqdn] = node[:fqdn] 
   node.set[:chef_server][:lb][:web_ui_fqdn] = node[:fqdn]
-  node.set['chef-server'][:configuration] = node[:chef_server]
 end
+node.set['chef-server'][:configuration] = node[:chef_server]
 
 include_recipe 'chef-server'
 
