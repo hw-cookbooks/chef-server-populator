@@ -1,9 +1,4 @@
-if(node[:chef_server_populator][:servername_override])
-  node.default[:chef_server_populator][:chef_server][:nginx][:server_name] = node[:chef_server_populator][:servername_override]
-  node.default[:chef_server_populator][:chef_server][:bookshelf][:vip] = node[:chef_server_populator][:servername_override]
-  node.default[:chef_server_populator][:chef_server][:lb][:api_fqdn] = node[:chef_server_populator][:servername_override] 
-  node.default[:chef_server_populator][:chef_server][:lb][:web_ui_fqdn] = node[:chef_server_populator][:servername_override] 
-end
+include_recipe 'chef-server-populator::configurator'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<

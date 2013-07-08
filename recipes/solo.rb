@@ -1,17 +1,4 @@
-if(node[:chef_server_populator][:servername_override])
-  node.set[:chef_server][:nginx][:server_name] = node[:chef_server_populator][:servername_override]
-  node.set[:chef_server][:bookshelf][:vip] = node[:chef_server_populator][:servername_override]
-  node.set[:chef_server][:lb][:api_fqdn] = node[:chef_server_populator][:servername_override] 
-  node.set[:chef_server][:lb][:web_ui_fqdn] = node[:chef_server_populator][:servername_override] 
-else
-  node.set[:chef_server][:nginx][:server_name] = node[:fqdn]
-  node.set[:chef_server][:bookshelf][:vip] = node[:fqdn]
-  node.set[:chef_server][:lb][:api_fqdn] = node[:fqdn] 
-  node.set[:chef_server][:lb][:web_ui_fqdn] = node[:fqdn]
-end
-node.set['chef-server'][:configuration] = node[:chef_server]
-
-include_recipe 'chef-server'
+include_recipe 'chef-server-populator::configurator'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
@@ -37,5 +24,8 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
 end
 
 execute 'install chef-server-populator cookbook' do
-  command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o /var/chef/cookbooks"
+  command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o #{Chef::Config[:cookbook_path].join(':')}"
+  only_if do
+    node[:chef_server_populator][:cookbook_auto_install]
+  end
 end
