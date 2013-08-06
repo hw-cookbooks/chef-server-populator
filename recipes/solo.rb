@@ -24,7 +24,7 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
 end
 
 execute 'install chef-server-populator cookbook' do
-  command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o #{Chef::Config[:cookbook_path].join(':')}"
+  command "#{knife_cmd} cookbook upload chef-server-populator #{knife_opts} -o #{Chef::Config[:cookbook_path].join(':')} --include-dependencies"
   only_if do
     node[:chef_server_populator][:cookbook_auto_install]
   end
