@@ -10,6 +10,7 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
   execute "create client: #{client}" do
     command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
     not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+    retries 5
   end
   if(pub_key && File.directory?(node[:chef_server_populator][:base_path]))
     pub_key_path = File.join(node[:chef_server_populator][:base_path], pub_key)
