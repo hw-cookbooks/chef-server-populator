@@ -16,3 +16,6 @@ default[:chef_server_populator][:servername_override] = nil
 default[:chef_server_populator][:chef_server][:configuration][:erchef][:s3_url_ttl] = 3600
 
 default[:chef_server_populator][:cookbook_auto_install] = true
+
+# ref: https://tickets.opscode.com/browse/CHEF-3838
+default[:chef_server_populator][:force_init] = false # upstart or sysvinit
