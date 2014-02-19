@@ -8,6 +8,10 @@ else
   end
 end
 
+if((%w(amazon xenserver).include?(node.platform) && node.platform_version.to_i >= 6) || node.platform == 'fedora')
+  node.default[:chef_server_populator][:force_init] = 'upstart'
+end
+
 package_resource = node.run_context.resource_collection.all_resources.detect do |r|
   r.class == Chef::Resource::Package && r.package_name.include?('chef-server')
 end
