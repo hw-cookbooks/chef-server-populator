@@ -1,5 +1,5 @@
 ##### Example bootstrap template #####
-# This bootstrap will create a brand new erchef server and 
+# This bootstrap will create a brand new erchef server and
 # use your existing settings to set things up. It will automatically
 # disable the webui, create a client named after the client in
 # your existing configuration, and update the public keys for your
@@ -11,9 +11,9 @@
 # FQDN. You can see it being done down there in the json building. The
 # example is based on eth0. Modify or remove as needed.
 
-bash -c '
+sudo bash -c '
 
-curl -L https://www.opscode.com/chef/install.sh | sudo bash
+curl -L https://www.opscode.com/chef/install.sh | bash
 mkdir -p /var/chef/cache /var/chef/cookbooks/chef-server /var/chef/cookbooks/chef-server-populator
 wget -qO- https://github.com/opscode-cookbooks/chef-server/archive/master.tar.gz | tar xvzC /var/chef/cookbooks/chef-server --strip-components=1
 wget -qO- https://github.com/hw-cookbooks/chef-server-populator/tarball/master | tar xvzC /var/chef/cookbooks/chef-server-populator --strip-components=1
@@ -39,11 +39,17 @@ mkdir -p /etc/chef
 cp /tmp/chef-server-setup/validation.pem /etc/chef/validation.pem
 chmod 600 /etc/chef/validation.pem
 
-IPADDR=`ip addr show eth0 | grep "inet " | awk -F" " '\''{print $2}'\'' | sed -e "s/\/24//"`
+IPADDR=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
+if [ $? -ne 0 ]
+  then
+    IPADDR=`ip addr show eth0 | grep "inet " | awk -F" " '\''{print $2}'\'' | sed -e "s/\/.+//"`
+fi
+
 (
 echo "
 {
   \"chef-server\": {
+     \"version\": \"11.0.8\",
     \"configuration\": {
       \"chef_server_webui\": {
         \"enable\": false
@@ -58,7 +64,7 @@ echo "
     \"servername_override\": \"${IPADDR}\",
     \"base_path\": \"/tmp/chef-server-setup\"
   },
-  \"run_list\": [ \"recipe[chef-server-populator]\", \"recipe[chef-server]\" ]
+  \"run_list\": [ \"recipe[chef-server]\", \"recipe[chef-server-populator]\" ]
 }
 "
 ) > /tmp/chef-server.json
@@ -73,6 +79,7 @@ log_level        :info
 log_location     STDOUT
 chef_server_url  "https://127.0.0.1"
 validation_client_name "<%= Chef::Config[:validation_client_name] %>"
+force_logger     true
 <% if @config[:chef_node_name] == nil %>
 # Using default node name
 <% else %>
