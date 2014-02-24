@@ -1,3 +1,7 @@
+unless(node[:chef_server_populator][:restore][:file].empty?)
+  include_recipe 'chef-server-populator::restore'
+end
+
 if(Chef::Config[:solo])
   include_recipe 'chef-server-populator::solo'
 else
@@ -25,3 +29,4 @@ file '/opt/chef-server/embedded/cookbooks/runit/recipes/default.rb' do
       package_resource
   end
 end
+
