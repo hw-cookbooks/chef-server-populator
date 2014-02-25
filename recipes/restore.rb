@@ -20,8 +20,8 @@ execute "restoring chef data" do
   creates '/etc/chef-server/restore.json'
 end
 
-execute "backup chef server start erchef" do
-  command "chef-server-ctl start"
+execute "backup chef server start" do
+  command "chef-server-ctl start erchef"
   creates '/etc/chef-server/restore.json'
 end
 
