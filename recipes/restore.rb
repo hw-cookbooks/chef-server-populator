@@ -15,7 +15,7 @@ end
 
 #Restore nodes from file
 execute "restoring chef data" do
-  command "/opt/chef-server/embedded/bin/pg_restore --clean --exit-on-error --dbname=opscode_chef #{file}"
+  command "/opt/chef-server/embedded/bin/pg_restore --clean --dbname=opscode_chef #{file}"
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
