@@ -1,5 +1,5 @@
 #Determine if we're using a remote file or a local file.
-if (node[:chef_server_populator][:restore][:file]).include?(uri.scheme)
+if (URI(node[:chef_server_populator][:restore][:file]).scheme)
   remote_file node[:chef_server_populator][:restore][:local_path] do
     source node[:chef_server_populator][:restore][:file]
   end
