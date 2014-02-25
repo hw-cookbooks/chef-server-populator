@@ -13,9 +13,21 @@ execute "backup chef server stop" do
   creates '/etc/chef-server/restore.json'
 end
 
-#Restore nodes from file
+#Drop and Restore entire chef database from file
+execute "dropping chef database" do
+  command '/opt/chef-server/embedded/bin/dropdb opscode_chef'
+  user 'opscode-pgsql'
+  creates '/etc/chef-server/restore.json'
+end
+  
 execute "restoring chef data" do
-  command "/opt/chef-server/embedded/bin/pg_restore --clean --dbname=opscode_chef #{file}"
+  command "/opt/chef-server/embedded/bin/pg_restore --create --dbname=postgres #{file}"
+  user 'opscode-pgsql'
+  creates '/etc/chef-server/restore.json'
+end
+
+execute "update local admin client" do
+  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key = E'`openssl rsa -in /etc/chef-server/admin.pem -pubout`' where username='admin'\""
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
