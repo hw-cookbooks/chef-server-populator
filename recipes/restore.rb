@@ -9,7 +9,7 @@ else
 end
 
 execute "backup chef server stop" do
-  command "chef-server-ctl stop"
+  command "chef-server-ctl stop erchef"
   creates '/etc/chef-server/restore.json'
 end
 
@@ -20,7 +20,7 @@ execute "restoring chef data" do
   creates '/etc/chef-server/restore.json'
 end
 
-execute "backup chef server start" do
+execute "backup chef server start erchef" do
   command "chef-server-ctl start"
   creates '/etc/chef-server/restore.json'
 end
