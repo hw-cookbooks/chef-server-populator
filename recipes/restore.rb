@@ -27,7 +27,7 @@ execute "restoring chef data" do
 end
 
 execute "update local admin client" do
-  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key = E'`openssl rsa -in /etc/chef-server/admin.pem -pubout`' where username='admin'\""
+  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key='`openssl rsa -in /etc/chef-server/admin.pem -pubout`' where username='admin'\""
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
