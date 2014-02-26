@@ -8,12 +8,9 @@ else
   file = node[:chef_server_populator][:restore][:file]
 end
 
-admin_pub_key = "foo"
-
-ruby_block 'generate local admin public key' do
-  block do
-    admin_pub_key = %x(openssl rsa -in /etc/chef-server/admin.pem -pubout)
-  end
+execute 'generate local admin public key' do
+  command "openssl rsa -in /etc/chef-server/admin.pem -pubout -out /etc/chef-server/admin.pub"
+  creates '/etc/chef-server/admin.pub'
 end
 
 execute "backup chef server stop" do
@@ -35,7 +32,7 @@ execute "restoring chef data" do
 end
 
 execute "update local admin client" do
-  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key='#{admin_pub_key}' where username='admin'\""
+  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key='\`openssl rsa -in /etc/chef-server/admin.pem -pubout`' where username='admin'\""
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
