@@ -37,7 +37,7 @@ ruby_block 'generate local admin public key' do
 end
 
 execute "update local admin client" do
-  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key='#{ENV['ADMIN_KEY']}' where username='admin'\""
+  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=\'\`openssl rsa -in /etc/chef-server/admin.pem -pubout\`\' where username=\'admin'\""
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
