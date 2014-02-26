@@ -8,31 +8,36 @@ else
   file = node[:chef_server_populator][:restore][:file]
 end
 
-execute "backup chef server stop" do
+execute 'backup chef server stop' do
   command "chef-server-ctl stop erchef"
   creates '/etc/chef-server/restore.json'
 end
 
 #Drop and Restore entire chef database from file
-execute "dropping chef database" do
+execute 'dropping chef database' do
   command '/opt/chef-server/embedded/bin/dropdb opscode_chef'
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
 
-execute "restoring chef data" do
+execute 'restoring chef data' do
   command "/opt/chef-server/embedded/bin/pg_restore --create --dbname=postgres #{file}"
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
 end
 
-execute "update local admin client" do
+file '/etc/chef/client.pem' do
+  action :nothing
+end
+
+execute 'update local clients' do
   command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\""
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
+  notifies :delete, 'file[/etc/chef/client.pem]'
 end
 
-execute "backup chef server start" do
+execute 'backup chef server start' do
   command "chef-server-ctl start erchef"
   creates '/etc/chef-server/restore.json'
 end
