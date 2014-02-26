@@ -8,10 +8,11 @@ else
   file = node[:chef_server_populator][:restore][:file]
 end
 
+String.new(admin_pub_key)
 
 ruby_block 'generate local admin public key' do
   block do
-    admin_pub_key = `openssl rsa -in /etc/chef-server/admin.pem -pubout`
+    admin_pub_key = %x(openssl rsa -in /etc/chef-server/admin.pem -pubout)
   end
 end
 
