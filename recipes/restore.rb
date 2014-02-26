@@ -8,7 +8,7 @@ else
   file = node[:chef_server_populator][:restore][:file]
 end
 
-admin_pub_key = String.new()
+admin_pub_key = "foo"
 
 ruby_block 'generate local admin public key' do
   block do
