@@ -28,9 +28,10 @@ if (backup_db AND backup_data)
      remote = Fog::Storage.new(creds)
      directory = <%= node[:chef_server_populator][:backup][:remote][:directory].inspect %>
      %w( db_file data_file).each do |file|
-     db_name = File.basename(file)
-     directory.files.create(:key => name, :body => open(file))
-     File.delete(file)
+       db_name = File.basename(file)
+       directory.files.create(:key => name, :body => open(file))
+       File.delete(file)
+     end
    end
 else
    $stderr.puts "Chef Server Backup Failed!"
