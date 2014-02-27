@@ -21,7 +21,8 @@ default[:chef_server_populator][:cookbook_auto_install] = true
 default[:chef_server_populator][:force_init] = false # upstart or sysvinit
 
 default[:chef_server_populator][:restore][:file] = nil
-default[:chef_server_populator][:restore][:local_path] = '/tmp/chef-server.dump'
+default[:chef_server_populator][:restore][:data] = nil
+default[:chef_server_populator][:restore][:local_path] = '/tmp/'
 
 default[:chef_server_populator][:backup][:dir] = '/tmp/chef-server/backup'
 default[:chef_server_populator][:backup][:file] = 'chef-server.dump'  

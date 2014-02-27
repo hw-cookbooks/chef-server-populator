@@ -1,11 +1,22 @@
 #Determine if we're using a remote file or a local file.
 if (URI(node[:chef_server_populator][:restore][:file]).scheme)
-  remote_file node[:chef_server_populator][:restore][:local_path] do
+  local_file = File.join(node[:chef_server_populator][:restore][:local_path], node[:chef_server_populator][:restore][:file].basename)
+  remote_file local_file do
     source node[:chef_server_populator][:restore][:file]
   end
-  file = node[:chef_server_populator][:restore][:local_path]
+  file = local_file
 else
   file = node[:chef_server_populator][:restore][:file]
+end
+
+if (URI(node[:chef_server_populator][:restore][:data]).scheme)
+  local_data = File.join(node[:chef_server_populator][:restore][:local_path], node[:chef_server_populator][:restore][:data].basename)
+  remote_file local_data do
+    source node[:chef_server_populator][:restore][:data]
+  end
+  data = local_data
+else
+  data = node[:chef_server_populator][:restore][:data]
 end
 
 file '/etc/chef/client.pem' do
@@ -34,6 +45,11 @@ end
 execute 'restoring chef data' do
   command "/opt/chef-server/embedded/bin/pg_restore --create --dbname=postgres #{file}"
   user 'opscode-pgsql'
+  creates '/etc/chef-server/restore.json'
+end
+
+execute 'restore bookshelf data' do
+  command "tar xzf #{data} -C /var/opt/chef-server/bookshelf/"
   creates '/etc/chef-server/restore.json'
 end
 
