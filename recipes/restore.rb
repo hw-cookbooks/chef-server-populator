@@ -1,6 +1,6 @@
 #Determine if we're using a remote file or a local file.
 if (URI(node[:chef_server_populator][:restore][:file]).scheme)
-  local_file = File.join(node[:chef_server_populator][:restore][:local_path], node[:chef_server_populator][:restore][:file].basename)
+  local_file = File.join(node[:chef_server_populator][:restore][:local_path], File.basename(node[:chef_server_populator][:restore][:file]))
   remote_file local_file do
     source node[:chef_server_populator][:restore][:file]
   end
@@ -10,7 +10,7 @@ else
 end
 
 if (URI(node[:chef_server_populator][:restore][:data]).scheme)
-  local_data = File.join(node[:chef_server_populator][:restore][:local_path], node[:chef_server_populator][:restore][:data].basename)
+  local_data = File.join(node[:chef_server_populator][:restore][:local_path], File.basename(node[:chef_server_populator][:restore][:data]))
   remote_file local_data do
     source node[:chef_server_populator][:restore][:data]
   end
