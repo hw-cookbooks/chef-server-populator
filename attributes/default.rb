@@ -25,7 +25,7 @@ default[:chef_server_populator][:restore][:data] = nil
 default[:chef_server_populator][:restore][:local_path] = '/tmp/'
 
 default[:chef_server_populator][:backup][:dir] = '/tmp/chef-server/backup'
-default[:chef_server_populator][:backup][:file] = 'chef-server.dump'  
+default[:chef_server_populator][:backup][:filename] = 'chef-server-full'
 default[:chef_server_populator][:backup][:remote][:connection] = nil
 default[:chef_server_populator][:backup][:schedule] = {
   :minute => '33',
