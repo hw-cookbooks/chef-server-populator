@@ -2,24 +2,22 @@
 
 chef_server_version = File.readlines('/opt/chef-server/version-manifest.txt').detect{|l|l.include?('version-manifest')}.split.last
 
-prefix = [ Time.now.to_i, "ver_#{chef_server_version}" ].join('-')
+prefix = [ Time.now.to_i, "ver_#{chef_server_version}", <%= node[:chef_server_populator][:backup][:filename].inspect %> ].join('-')
 
 db_file = File.join(
             <%= node[:chef_server_populator][:backup][:dir].inspect %>,
             [ prefix, 
-            <%= node[:chef_server_populator][:backup][:filename].inspect %>,
-            '.dump' ].join('-') 
+            'dump' ].join('.') 
           )
 
 data_file = File.join(
               <%= node[:chef_server_populator][:backup][:dir].inspect %>,
               [ prefix, 
-              <%= node[:chef_server_populator][:backup][:filename].inspect %>,
-              '.tar.gz' ].join('-') 
+              '.tar.gz' ].join('.') 
             )
 
 backup_db = system("sudo -u opscode-pgsql /opt/chef-server/embedded/bin/pg_dump opscode_chef --format=custom > #{db_file}")
-backup_data = system("tar xcf #{data_file} -C /var/opt/chef-server/bookshelf/data")
+backup_data = system("tar -czf #{data_file} -C /var/opt/chef-server/bookshelf data")
  
 if (backup_db AND backup_data)
    creds = <%= node[:chef_server_populator][:backup][:remote][:connection].inspect %>
