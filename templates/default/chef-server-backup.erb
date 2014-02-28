@@ -1,4 +1,4 @@
-#!<%= node[:languages][:ruby][:ruby_bin] %>
+#!/opt/chef/embedded/bin/ruby
 
 chef_server_version = File.readlines('/opt/chef-server/version-manifest.txt').detect{|l|l.include?('version-manifest')}.split.last
 
@@ -20,13 +20,13 @@ backup_db = system("sudo -u opscode-pgsql /opt/chef-server/embedded/bin/pg_dump 
 backup_data = system("tar -czf #{data_file} -C /var/opt/chef-server/bookshelf data")
  
 if backup_db && backup_data
-   creds = <%= node[:chef_server_populator][:backup][:remote][:connection].inspect %>
+   creds = <%= node[:chef_server_populator][:backup][:remote][:connection].symbolize_keys %>
    if(creds)
      require 'fog'
      remote = Fog::Storage.new(creds)
-     directory = <%= node[:chef_server_populator][:backup][:remote][:directory].inspect %>
-     %w( db_file data_file).each do |file|
-       db_name = File.basename(file)
+     directory = remote.directories.create( :key => "<%= node[:chef_server_populator][:backup][:remote][:directory].inspect %>" )
+     [db_file, data_file].each do |file|
+       name = File.basename(file)
        directory.files.create(:key => name, :body => open(file))
        File.delete(file)
      end
@@ -35,3 +35,4 @@ else
    $stderr.puts "Chef Server Backup Failed!"
    exit -1
 end
+
