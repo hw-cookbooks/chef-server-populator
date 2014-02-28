@@ -24,7 +24,7 @@ if backup_db && backup_data
    if(creds)
      require 'fog'
      remote = Fog::Storage.new(creds)
-     directory = remote.directories.create( :key => "<%= node[:chef_server_populator][:backup][:remote][:directory].inspect %>" )
+     directory = remote.directories.create( :key => <%= node[:chef_server_populator][:backup][:remote][:directory].inspect %> )
      [db_file, data_file].each do |file|
        name = File.basename(file)
        directory.files.create(:key => name, :body => open(file))
