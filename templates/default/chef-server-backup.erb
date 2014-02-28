@@ -13,7 +13,7 @@ db_file = File.join(
 data_file = File.join(
               <%= node[:chef_server_populator][:backup][:dir].inspect %>,
               [ prefix, 
-              '.tar.gz' ].join('.') 
+              'tar.gz' ].join('.') 
             )
 
 backup_db = system("sudo -u opscode-pgsql /opt/chef-server/embedded/bin/pg_dump opscode_chef --format=custom > #{db_file}")
