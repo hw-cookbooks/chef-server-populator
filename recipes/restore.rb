@@ -48,6 +48,14 @@ execute 'restoring chef data' do
   creates '/etc/chef-server/restore.json'
 end
 
+%w( opscode-pgsql opscode_chef opscode_chef_ro ).each do |pg_role|
+  execute "set #{pg_role} db permissions" do
+    command "GRANT TEMPORARY, CREATE, CONNECT ON DATABASE opscode_chef TO opscode_chef_ro;"
+    user 'opscode-pgsql'
+    creates '/etc/chef-server/restore.json'
+  end
+end
+
 execute 'restore bookshelf data' do
   command "tar xzf #{data} -C /var/opt/chef-server/bookshelf/"
   creates '/etc/chef-server/restore.json'
