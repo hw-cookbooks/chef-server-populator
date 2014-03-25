@@ -1,11 +1,13 @@
 ##### Example bootstrap template #####
-# This bootstrap will create a brand new erchef server and
-# use your existing settings to set things up. It will automatically
-# disable the webui, create a client named after the client in
-# your existing configuration, and update the public keys for your
-# client, as well as the chef-validator. Afterwards, it will install
-# the cookbooks it requires for itself, and then register itself with
-# itself. How meta.
+# This bootstrap will create a new erchef server and restore it using 
+# a backup of your existing chef server. It will automatically
+# disable the webui, restore the entire chef database, and reset the public 
+# key for the local admin user. It will also restore all the cookbooks 
+# from the previous/existing chef server, so all cookbook versions will be
+# available. Finally, it will register itself with itself. How meta.
+#
+# This expects two remote files, one a is pg_dump of your existing chef server
+# database, and one is a tarball of the bookshelf files from that chef server.
 #
 # NOTE: It uses the node IP address for configuration, rather than the
 # FQDN. You can see it being done down there in the json building. The
