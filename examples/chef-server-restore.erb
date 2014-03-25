@@ -44,7 +44,7 @@ chmod 600 /etc/chef/validation.pem
 IPADDR=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 if [ $? -ne 0 ]
   then
-    IPADDR=`ip addr show eth0 | grep "inet " | awk -F" " '\''{print $2}'\'' | sed -e "s/\/.+//"`
+    IPADDR=`ip addr show eth0 | grep "inet " | awk -F" " '\''{print $2}'\'' | sed -e "s/\/..//"`
 fi
 
 (
