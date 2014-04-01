@@ -4,7 +4,14 @@ end
 
 #Upload to Remote Storage
 # Include fog
-%w(gcc libxml2 libxml2-devel libxslt libxslt-devel).each do |fog_dep|
+case node[:platform_family]
+when 'debian'
+  packages =  %w(gcc libxml2 libxml2-dev libxslt libxslt-dev)
+when 'rhel'
+  packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel)
+end
+  packages.each do |fog_dep|
+
   package fog_dep do
     only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
   end
