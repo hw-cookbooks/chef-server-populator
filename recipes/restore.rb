@@ -1,6 +1,6 @@
 #Determine if we're using a remote file or a local file.
 if (URI(node[:chef_server_populator][:restore][:file]).scheme)
-  local_file = File.join(node[:chef_server_populator][:restore][:local_path], File.basename(node[:chef_server_populator][:restore][:file]))
+  local_file = File.join(node[:chef_server_populator][:restore][:local_path], 'chef_database_restore.dump')
   remote_file local_file do
     source node[:chef_server_populator][:restore][:file]
   end
@@ -10,7 +10,7 @@ else
 end
 
 if (URI(node[:chef_server_populator][:restore][:data]).scheme)
-  local_data = File.join(node[:chef_server_populator][:restore][:local_path], File.basename(node[:chef_server_populator][:restore][:data]))
+  local_data = File.join(node[:chef_server_populator][:restore][:local_path], 'chef_data_restore.tar.gz')
   remote_file local_data do
     source node[:chef_server_populator][:restore][:data]
   end
