@@ -31,7 +31,7 @@ ruby_block 'set admin public key' do
 end
 
 execute 'backup chef server stop' do
-  command "chef-server-ctl stop erchef"
+  command 'chef-server-ctl stop erchef'
   creates '/etc/chef-server/restore.json'
 end
 
@@ -69,7 +69,12 @@ execute 'update local client' do
 end
 
 execute 'backup chef server start' do
-  command "chef-server-ctl start erchef"
+  command 'chef-server-ctl start erchef'
+  creates '/etc/chef-server/restore.json'
+end
+
+execute 'backup chef server reindex' do
+  command 'chef-server-ctl reindex'
   creates '/etc/chef-server/restore.json'
 end
 
