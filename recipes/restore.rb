@@ -78,6 +78,12 @@ execute 'backup chef server reindex' do
   creates '/etc/chef-server/restore.json'
 end
 
+execute 'backup restart chef server webui' do
+  command 'chef-server-ctl chef-server-webui restart'
+  creates '/etc/chef-server/restore.json'
+  only_if node[:chef_server][:chef_server_webui][:enable]
+end
+
 directory '/etc/chef-server'
 
 file '/etc/chef-server/restore.json' do
