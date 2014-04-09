@@ -81,7 +81,7 @@ end
 execute 'backup restart chef server webui' do
   command 'chef-server-ctl chef-server-webui restart'
   creates '/etc/chef-server/restore.json'
-  only_if node[:chef_server][:chef_server_webui][:enable]
+  only_if node[:chef_server][:configuration][:chef_server_webui][:enable]
 end
 
 directory '/etc/chef-server'
