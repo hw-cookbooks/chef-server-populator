@@ -68,17 +68,22 @@ execute 'update local client' do
   notifies :delete, 'file[/etc/chef/client.pem]'
 end
 
-execute 'backup chef server start' do
+execute 'restore chef server start' do
   command 'chef-server-ctl start erchef'
   creates '/etc/chef-server/restore.json'
 end
 
-execute 'backup chef server reindex' do
+execute 'restore chef server wait for erchef' do
+  command 'sleep 10'
+  creates '/etc/chef-server/restore.json'
+end
+
+execute 'restore chef server reindex' do
   command 'chef-server-ctl reindex'
   creates '/etc/chef-server/restore.json'
 end
 
-execute 'backup restart chef server webui' do
+execute 'restore restart chef server webui' do
   command 'chef-server-ctl restart chef-server-webui'
   creates '/etc/chef-server/restore.json'
   only_if node['chef-server'][:configuration][:chef_server_webui][:enable]
