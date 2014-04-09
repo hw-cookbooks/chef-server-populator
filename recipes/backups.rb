@@ -22,7 +22,7 @@ gem_package 'fog' do
 end
 
 template '/usr/local/bin/chef-server-backup' do
-  mode '0755'
+  mode '0700'
 end
 
 cron 'Chef Server Backups' do
