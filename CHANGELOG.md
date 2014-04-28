@@ -1,3 +1,8 @@
+## v0.3.2
+* Add client creation retries to stabilize initial bootstrap
+* Updates to example bootstrap script
+* Add support for backup/restore (thanks @luckymike!)
+
 ## v0.3.0
 * Include chef-server dependency
 * Update configuration overrides for chef-server
