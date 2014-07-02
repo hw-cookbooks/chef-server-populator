@@ -16,7 +16,7 @@ data_file = File.join(
               'tar.gz' ].join('.') 
             )
 
-backup_db = system("/opt/chef-server/embedded/bin/pg_dump opscode_chef --username=opscode-pgsql --format=custom > #{db_file}")
+backup_db = system("sudo -i -u opscode-pgsql /opt/chef-server/embedded/bin/pg_dump opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}")
 backup_data = system("tar -czf #{data_file} -C /var/opt/chef-server/bookshelf data")
  
 if backup_db && backup_data

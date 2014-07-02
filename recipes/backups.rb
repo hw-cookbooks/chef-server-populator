@@ -1,5 +1,8 @@
 directory node[:chef_server_populator][:backup][:dir] do
   recursive true
+  owner 'root'
+  group 'opscode-pgsql'
+  mode  '0775'
 end
 
 #Upload to Remote Storage
