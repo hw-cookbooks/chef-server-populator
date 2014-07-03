@@ -1,9 +1,13 @@
 include_recipe 'chef-server-populator::configurator'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
+ssl_port = ''
+if node['chef-server']['configuration']['nginx']['ssl_port']
+  ssl_port = ":#[node['chef-server']['configuration']['nginx']['ssl_port']}"
+end rescue NoMethodError 
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
   "-u #{node[:chef_server_populator][:user]} " <<
-  "-s https://127.0.0.1"
+  "-s https://127.0.0.1#{ssl_port}"
 pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 if(node[:chef_server_populator][:databag])
