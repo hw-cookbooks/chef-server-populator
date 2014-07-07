@@ -34,7 +34,7 @@ if(node[:chef_server_populator][:databag])
           execute "set public key for: #{client}" do
             command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key}' where name = '#{client}'\""
             user 'opscode-pgsql'
-            not_if "#{pg_cmd} -c \"select public_key from clients where name = '#{client}' and public_key = E'#{pub_key}'\" -tqa | grep #{client}"
+            not_if %Q(sudo -i -u opscode-pgsql #{pg_cmd} -c "select name from clients where name = '#{client}' and public_key = E'#{pub_key.gsub("\n", '\\n')}'" -tq | tr -d ' ' | grep '^#{client}$')
           end
         end
       end
