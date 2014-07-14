@@ -6,6 +6,7 @@ if(Chef::Config[:solo])
   include_recipe 'chef-server-populator::solo'
 else
   include_recipe 'chef-server-populator::client'
+  include_recipe 'chef-server-populator::user'
 end
 
 if((%w(amazon xenserver).include?(node.platform) && node.platform_version.to_i >= 6) || node.platform == 'fedora')
