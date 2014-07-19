@@ -3,7 +3,7 @@ include_recipe 'chef-server-populator::configurator'
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
   "-u #{node[:chef_server_populator][:user]} " <<
-  "-s https://127.0.0.1"
+  "-s #{node[:chef_server_populator][:server_url]}"
 pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 node[:chef_server_populator][:clients].each do |client, pub_key|
