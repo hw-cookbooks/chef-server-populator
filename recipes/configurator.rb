@@ -1,3 +1,7 @@
+if(node[:chef_server_populator][:chef_server])
+  node.set['chef-server'] = node['chef-server'].merge(node[:chef_server_populator][:chef_server])
+end
+
 unless(node[:chef_server_populator][:endpoint])
   node.default[:chef_server_populator][:endpoint] = node[:chef_server_populator][:servername_override]
 end
