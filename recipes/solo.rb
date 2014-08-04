@@ -29,4 +29,5 @@ execute 'install chef-server-populator cookbook' do
   only_if do
     node[:chef_server_populator][:cookbook_auto_install]
   end
+  retries 5
 end
