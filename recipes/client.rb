@@ -1,10 +1,12 @@
 include_recipe 'chef-server-populator::configurator'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
-ssl_port = ''
-if node['chef-server']['configuration']['nginx']['ssl_port']
-  ssl_port = ":#[node['chef-server']['configuration']['nginx']['ssl_port']}"
-end rescue NoMethodError 
+
+ssl_port = %w(chef-server configuration nginx ssl_port).inject(node) do |memo, key|
+  memo[key] || break
+end
+ssl_port = ":#{ssl_port}" if ssl_port
+
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
   "-u #{node[:chef_server_populator][:user]} " <<
   "-s https://127.0.0.1#{ssl_port}"
@@ -41,4 +43,3 @@ if(node[:chef_server_populator][:databag])
     Chef::Log.warn 'Chef server populator failed to locate population data bag'
   end
 end
-
