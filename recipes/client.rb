@@ -24,11 +24,13 @@ if(node[:chef_server_populator][:databag])
         execute "delete client: #{client}" do
           command "#{knife_cmd} client delete #{client} -d #{knife_opts}"
           only_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+          retries 10
         end
       else
         execute "create client: #{client}" do
           command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
           not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+          retries 10
         end
         if(pub_key)
           execute "set public key for: #{client}" do
