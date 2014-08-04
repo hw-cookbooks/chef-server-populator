@@ -10,7 +10,6 @@ ssl_port = ":#{ssl_port}" if ssl_port
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
   "-u #{node[:chef_server_populator][:user]} " <<
   "-s https://127.0.0.1#{ssl_port}"
-pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 if(node[:chef_server_populator][:databag])
   begin
@@ -20,24 +19,53 @@ if(node[:chef_server_populator][:databag])
       client = item['id']
       pub_key = item['chef_server']['client_key']
       enabled = item['chef_server']['enabled']
+      types = [item['chef_server'].fetch('type', 'client')].flatten
+      admin = item['chef_server'].fetch('admin', true)
       if(item['enabled'] == false)
-        execute "delete client: #{client}" do
-          command "#{knife_cmd} client delete #{client} -d #{knife_opts}"
-          only_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
-          retries 10
+        if(types.include?('client'))
+          execute "delete client: #{client}" do
+            command "#{knife_cmd} client delete #{client} -d #{knife_opts}"
+            only_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+            retries 10
+          end
+        end
+        if(types.include?('user'))
+          execute "delete user: #{client}" do
+            command "#{knife_cmd} user delete #{client} -y #{knife_opts}"
+            only_if "#{knife_cmd} user list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+          end
         end
       else
-        execute "create client: #{client}" do
-          command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
-          not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
-          retries 10
-        end
-        if(pub_key)
-          execute "set public key for: #{client}" do
-            command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key}' where name = '#{client}'\""
-            user 'opscode-pgsql'
-            not_if %Q(sudo -i -u opscode-pgsql #{pg_cmd} -c "select name from clients where name = '#{client}' and public_key = E'#{pub_key.gsub("\n", '\\n')}'" -tq | tr -d ' ' | grep '^#{client}$')
+        if(types.include?('client'))
+          execute "create client: #{client}" do
+            command "#{knife_cmd} client create #{client}#{' --admin' if admin} -d #{knife_opts}"
+            not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
+            retries 10
           end
+          if(pub_key)
+            execute "set public key for: #{client}" do
+              command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key}' where name = '#{client}'\""
+              user 'opscode-pgsql'
+              not_if %Q(sudo -i -u opscode-pgsql #{pg_cmd} -c "select name from clients where name = '#{client}' and public_key = E'#{pub_key.gsub("\n", '\\n')}'" -tq | tr -d ' ' | grep '^#{client}$')
+              end
+            end
+          end
+        end
+        if(types.include?('user'))
+
+          key_file = "#{Chef::Config[:file_cache_path]}/#{username}.pub"
+          password = SecureRandom.urlsafe_base64(23)
+          file key_file do
+            backup false
+            content pub_key
+            mode '0400'
+          end
+
+          execute "create user: #{client}" do
+            command "#{knife_cmd} user create #{username}#{' --admin' if admin} --user-key #{key_file} -p #{SecureRandom.urlsafe_base64(23)} -d #{knife_opts}"
+            not_if "#{knife_cmd} user list #{knife_opts}| tr -d ' ' | grep '^#{username}$'"
+          end
+
         end
       end
     end
