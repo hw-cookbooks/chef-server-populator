@@ -30,7 +30,12 @@ Structure of the data bag item:
   "id": "client_name",
   "chef_server": {
     "client_key": "public key contents",
-    "enabled": true
+    "type": [
+      "user",
+      "client"
+    ],
+    "enabled": true,
+    "admin": true
   }
 }
 ```
@@ -39,7 +44,7 @@ Restoring from a backup:
 
 * Set path to restore file with node[:chef_server_populator][:restore][:file]
 * The restore recipe is run if a restore file is set
-* The restore file can be remote or local 
+* The restore file can be remote or local
 
 When enabling backups:
 
@@ -50,7 +55,7 @@ When enabling backups:
 
 ## Extras
 
-Need to use the IP address of the node for a bit, or another name  instead of 
+Need to use the IP address of the node for a bit, or another name  instead of
 having `node[:fqdn]`?
 
 * `node[:chef_server_populator][:servername_override]`
