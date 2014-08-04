@@ -21,6 +21,7 @@ if(node[:chef_server_populator][:databag])
       enabled = item['chef_server']['enabled']
       types = [item['chef_server'].fetch('type', 'client')].flatten
       admin = item['chef_server'].fetch('admin', true)
+      password = item['chef_server'].fetch('password', SecureRandom.urlsafe_base64(23))
       if(item['enabled'] == false)
         if(types.include?('client'))
           execute "delete client: #{client}" do
@@ -62,7 +63,7 @@ if(node[:chef_server_populator][:databag])
           end
 
           execute "create user: #{client}" do
-            command "#{knife_cmd} user create #{username}#{' --admin' if admin} --user-key #{key_file} -p #{SecureRandom.urlsafe_base64(23)} -d #{knife_opts}"
+            command "#{knife_cmd} user create #{username}#{' --admin' if admin} --user-key #{key_file} -p #{password} -d #{knife_opts}"
             not_if "#{knife_cmd} user list #{knife_opts}| tr -d ' ' | grep '^#{username}$'"
           end
 
