@@ -6,10 +6,6 @@ if(Chef::Config[:solo])
   include_recipe 'chef-server-populator::solo'
 else
   include_recipe 'chef-server-populator::client'
-
-  unless(node[:chef_server_populator][:chef_server].empty?)
-    include_recipe 'chef-server-populator::configurator'
-  end
 end
 
 if((%w(amazon xenserver).include?(node.platform) && node.platform_version.to_i >= 6) || node.platform == 'fedora')
@@ -29,4 +25,3 @@ file '/opt/chef-server/embedded/cookbooks/runit/recipes/default.rb' do
       package_resource
   end
 end
-
