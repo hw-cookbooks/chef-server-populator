@@ -24,7 +24,22 @@ gem_package 'fog' do
   only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
 end
 
-template '/usr/local/bin/chef-server-backup' do
+directory node[:chef_server_populator][:configuration_directory] do
+  recursive true
+  owner 'root'
+  mode 0700
+end
+
+file File.join(node[:chef_server_populator][:configuration_directory], 'backup.json') do
+  content Chef::JSONCompat.to_json_pretty(
+    node[:chef_server_populator][:backup]
+  )
+  owner 'root'
+  mode 0600
+end
+
+file '/usr/local/bin/chef-server-backup' do
+  source 'chef-server-backup.rb'
   mode '0700'
 end
 
@@ -33,4 +48,5 @@ cron 'Chef Server Backups' do
   node[:chef_server_populator][:backup][:schedule].each do |k,v|
     send(k,v)
   end
+  path "$PATH:/opt/chef/embedded/bin/"
 end
