@@ -86,7 +86,11 @@ end
 execute 'restore restart chef server webui' do
   command 'chef-server-ctl restart chef-server-webui'
   creates '/etc/chef-server/restore.json'
-  only_if{ node[:chef_server]['chef-server-webui'][:enable] }
+  only_if do
+    %w(chef-server configuration web-server-webui enable).inject(node) do |memo, key|
+      memo[key] || break
+    end
+  end
 end
 
 directory '/etc/chef-server'
