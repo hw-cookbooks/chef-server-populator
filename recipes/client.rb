@@ -48,14 +48,12 @@ if(node[:chef_server_populator][:databag])
               command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key}' where name = '#{client}'\""
               user 'opscode-pgsql'
               not_if %Q(sudo -i -u opscode-pgsql #{pg_cmd} -c "select name from clients where name = '#{client}' and public_key = E'#{pub_key.gsub("\n", '\\n')}'" -tq | tr -d ' ' | grep '^#{client}$')
-              end
             end
           end
         end
         if(types.include?('user'))
 
           key_file = "#{Chef::Config[:file_cache_path]}/#{username}.pub"
-          password = SecureRandom.urlsafe_base64(23)
           file key_file do
             backup false
             content pub_key
