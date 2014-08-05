@@ -1,4 +1,5 @@
-unless(node[:chef_server_populator][:restore][:file].empty?)
+if(!node[:chef_server_populator][:restore][:file].empty?
+    && node[:chef_server_populator][:restore][:file] != 'none')
   include_recipe 'chef-server-populator::restore'
 end
 
