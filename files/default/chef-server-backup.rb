@@ -6,7 +6,7 @@ require 'mixlib/shellout'
 
 DEFAULT_CONFIGURATION_PATH = '/etc/chef-server/backup.json'
 
-if(ARGV.size > 1 || !File.exists?(ARGV.first.to_s))
+if(ARGV.size > 1 || (ARGV.first && !File.exists?(ARGV.first.to_s)))
   puts 'Usage: chef-server-backup CONFIG_FILE_PATH'
   exit
 else
