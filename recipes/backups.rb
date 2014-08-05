@@ -1,8 +1,7 @@
 directory node[:chef_server_populator][:backup][:dir] do
   recursive true
-  owner 'root'
-  group 'opscode-pgsql'
-  mode  '0775'
+  owner 'opscode-pgsql'
+  mode  '0755'
 end
 
 #Upload to Remote Storage
@@ -38,7 +37,7 @@ file File.join(node[:chef_server_populator][:configuration_directory], 'backup.j
   mode 0600
 end
 
-file '/usr/local/bin/chef-server-backup' do
+cookbook_file '/usr/local/bin/chef-server-backup' do
   source 'chef-server-backup.rb'
   mode '0700'
 end
