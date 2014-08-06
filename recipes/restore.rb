@@ -31,7 +31,7 @@ ruby_block 'set admin public key' do
 end
 
 execute 'backup chef server stop' do
-  command 'chef-server-ctl stop erchef'
+  command 'chef-server-ctl stop'
   creates '/etc/chef-server/restore.json'
 end
 
@@ -69,7 +69,7 @@ execute 'update local client' do
 end
 
 execute 'restore chef server start' do
-  command 'chef-server-ctl start erchef'
+  command 'chef-server-ctl start'
   creates '/etc/chef-server/restore.json'
 end
 
@@ -81,20 +81,7 @@ end
 execute 'restore chef server reindex' do
   command 'chef-server-ctl reindex'
   creates '/etc/chef-server/restore.json'
-end
-
-execute 'restore restart chef server webui' do
-  command 'chef-server-ctl restart chef-server-webui'
-  creates '/etc/chef-server/restore.json'
-  only_if do
-    result = %w(chef-server configuration web-server-webui enable).inject(node) do |memo, key|
-      memo[key] || break
-    end
-    # @note the `enable` attribute is defaulted to true within bottom
-    # level cookbook. If no configuration value is detected from the
-    # top level cookbook, assume bottom level default.
-    result.nil? ? true : result
-  end
+  retries 5
 end
 
 directory '/etc/chef-server'
