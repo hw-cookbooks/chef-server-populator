@@ -78,5 +78,3 @@ if(remote_creds)
 else
   puts 'WARN: No remote credentials found. Backup is local only!'
 end
-
-puts 'SUCCESS: Backup is complete!'
