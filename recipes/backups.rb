@@ -41,6 +41,7 @@ end
 cookbook_file '/usr/local/bin/chef-server-backup' do
   source 'chef-server-backup.rb'
   mode '0700'
+  retries 3
 end
 
 cron 'Chef Server Backups' do
