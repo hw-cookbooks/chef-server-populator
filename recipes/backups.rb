@@ -21,6 +21,7 @@ end
 
 gem_package 'fog' do
   only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
+  retries 2
 end
 
 directory node[:chef_server_populator][:configuration_directory] do
