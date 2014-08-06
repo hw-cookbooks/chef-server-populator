@@ -83,18 +83,9 @@ execute 'restore chef server reindex' do
   creates '/etc/chef-server/restore.json'
 end
 
-execute 'restore restart chef server webui' do
-  command 'chef-server-ctl restart chef-server-webui'
+execute 'restore chef server restart' do
+  command 'chef-server-ctl restart'
   creates '/etc/chef-server/restore.json'
-  only_if do
-    result = %w(chef-server configuration web-server-webui enable).inject(node) do |memo, key|
-      memo[key] || break
-    end
-    # @note the `enable` attribute is defaulted to true within bottom
-    # level cookbook. If no configuration value is detected from the
-    # top level cookbook, assume bottom level default.
-    result.nil? ? true : result
-  end
 end
 
 directory '/etc/chef-server'
