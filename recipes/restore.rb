@@ -35,6 +35,11 @@ execute 'backup chef server stop' do
   creates '/etc/chef-server/restore.json'
 end
 
+execute 'backup chef server bookshelf stop' do
+  command 'chef-server-ctl stop bookshelf'
+  creates '/etc/chef-server/restore.json'
+end
+
 #Drop and Restore entire chef database from file
 execute 'dropping chef database' do
   command '/opt/chef-server/embedded/bin/dropdb opscode_chef'
@@ -66,6 +71,11 @@ execute 'update local client' do
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
   notifies :delete, 'file[/etc/chef/client.pem]'
+end
+
+execute 'restore chef server bookshelf start' do
+  command 'chef-server-ctl start bookshelf'
+  creates '/etc/chef-server/restore.json'
 end
 
 execute 'restore chef server start' do
