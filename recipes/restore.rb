@@ -61,6 +61,11 @@ end
   end
 end
 
+execute 'remove existing bookshelf data' do
+  command "rm -rf /var/opt/chef-server/bookshelf/data/"
+  creates '/etc/chef-server/restore.json'
+end
+
 execute 'restore bookshelf data' do
   command "tar xzf #{data} -C /var/opt/chef-server/bookshelf/"
   creates '/etc/chef-server/restore.json'
