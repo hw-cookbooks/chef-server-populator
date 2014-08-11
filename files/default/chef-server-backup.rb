@@ -39,21 +39,32 @@ data_file = File.join(
   "#{prefix}.tgz"
 )
 
-backup = Mixlib::ShellOut.new([
-    '/opt/chef-server/embedded/bin/pg_dump',
-    "opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}"
-  ].join(' '),
-  :user => 'opscode-pgsql'
-)
+# stop server
+stop_service = Mixlib::ShellOut.new('chef-server-ctl stop')
+stop_service.run_command
+stop_service.error!
 
-backup.run_command
-backup.error!
+begin
+  backup = Mixlib::ShellOut.new([
+      '/opt/chef-server/embedded/bin/pg_dump',
+      "opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}"
+    ].join(' '),
+    :user => 'opscode-pgsql'
+  )
 
-backup_data = Mixlib::ShellOut.new(
-  "tar -czf #{data_file} -C /var/opt/chef-server/bookshelf data"
-)
-backup_data.run_command
-backup_data.error!
+  backup.run_command
+  backup.error!
+
+  backup_data = Mixlib::ShellOut.new(
+    "tar -czf #{data_file} -C /var/opt/chef-server/bookshelf data"
+  )
+  backup_data.run_command
+  backup_data.error!
+ensure
+  start_service = Mixlib::ShellOut.new('chef-server-ctl start')
+  start_service.run_command
+  start_service.error!
+end
 
 remote_creds = [:remote, :connection].inject(config) do |memo, key|
   memo[key] || break
