@@ -62,7 +62,7 @@ end
 end
 
 execute 'restore bookshelf data' do
-  command "tar xzf #{data} -C /var/opt/chef-server/"
+  command "tar xzf #{data} -C /var/opt/chef-server/bookshelf/"
   creates '/etc/chef-server/restore.json'
 end
 
