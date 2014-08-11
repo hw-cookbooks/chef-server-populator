@@ -1,3 +1,11 @@
+## v0.4.0
+* Allow for creation of clients, users, or both
+* Store backup configuration in separate JSON file
+* Provide proper retries to account for temporary server unavailability
+* Include full server restart on restore from backup
+* Provide 'latest' backup files along with named files
+* Convert backup script from template to cookbook file
+
 ## v0.3.2
 * Add client creation retries to stabilize initial bootstrap
 * Updates to example bootstrap script
