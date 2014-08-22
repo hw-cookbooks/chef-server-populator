@@ -1,3 +1,6 @@
+require 'open-uri'
+require 'openssl'
+
 if(Chef::Config[:solo])
   include_recipe 'chef-server-populator::solo'
 else
@@ -25,4 +28,16 @@ file '/opt/chef-server/embedded/cookbooks/runit/recipes/default.rb' do
     node[:chef_server_populator][:force_init] &&
       package_resource
   end
+end
+
+ruby_block 'chef server readiness wait' do
+  block do
+    response = open('https://localhost/_status',
+      :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE
+    ).read
+    unless(Chef::JSONCompat.to_json(response)['status'] == 'pong')
+      raise 'Chef server not in ready state'
+    end
+  end
+  retries 10
 end
