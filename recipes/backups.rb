@@ -10,7 +10,7 @@ case node[:platform_family]
 when 'debian'
   packages =  %w(gcc libxml2 libxml2-dev libxslt-dev)
 when 'rhel'
-  packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel)
+  packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel patch)
 end
   packages.each do |fog_dep|
 
