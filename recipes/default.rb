@@ -35,7 +35,7 @@ ruby_block 'chef server readiness wait' do
     response = open('https://localhost/_status',
       :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE
     ).read
-    unless(Chef::JSONCompat.to_json(response)['status'] == 'pong')
+    unless(Chef::JSONCompat.from_json(response)['status'] == 'pong')
       raise 'Chef server not in ready state'
     end
   end
