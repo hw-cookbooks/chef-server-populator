@@ -5,6 +5,7 @@
 * Include full server restart on restore from backup
 * Provide 'latest' backup files along with named files
 * Convert backup script from template to cookbook file
+* Make service restarts more consistent
 
 ## v0.3.2
 * Add client creation retries to stabilize initial bootstrap
