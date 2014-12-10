@@ -1,6 +1,10 @@
 require 'open-uri'
 require 'openssl'
 
+file '/tmp/chef_client_config.rb' do
+  content 'ssl_verify_mode :verify_none'
+end
+
 if(Chef::Config[:solo])
   include_recipe 'chef-server-populator::solo'
 else

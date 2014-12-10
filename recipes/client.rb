@@ -9,7 +9,8 @@ ssl_port = ":#{ssl_port}" if ssl_port
 
 knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
   "-u #{node[:chef_server_populator][:user]} " <<
-  "-s https://127.0.0.1#{ssl_port}"
+  "-s https://127.0.0.1#{ssl_port} " <<
+  "-c /tmp/chef_client_config.rb"
 pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 if(node[:chef_server_populator][:databag])
