@@ -21,7 +21,7 @@ if((%w(amazon xenserver).include?(node.platform) && node.platform_version.to_i >
 end
 
 package_resource = node.run_context.resource_collection.all_resources.detect do |r|
-  r.class == Chef::Resource::Package && r.package_name.include?('chef-server')
+  r.is_a?(Chef::Resource::Package) && r.package_name.include?('chef-server')
 end
 
 file '/opt/chef-server/embedded/cookbooks/runit/recipes/default.rb' do
