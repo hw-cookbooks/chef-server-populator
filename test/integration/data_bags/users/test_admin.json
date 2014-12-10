@@ -1,0 +1,7 @@
+{
+  "id": "test_admin",
+  "chef_server": {
+    "client_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAybxxQf9qHvKtL2j3DEKM\nrATSEuGyaHAlgtgmcK/SvXsK8Y+10pNeeyxgIof9+Q3CyHmDzK1piTcFVYTRZxom\nwJwSWmZrYFYG9Um4FW1/E2IRQrpSbLO4jCSzPwYiEvbacQPqfFoVsGYdUmfUpCWa\nJxEoq88FbMB1ktoHsku+B4q45lsB13+64QyOG3bf2e/qoIVYkfBe+sOHmwBKnKf2\n1qS0Njngfo2+cT38fNqRoqjA5MjiCV+6WzDrofuPKmlWvflTKiREnaVUKus4yJpW\nANnFXVAxLFJcA4YNYIaqz0PSgq1FBIak2gXbLbpFOtp0hbE1suf4fSrwalsdsPEs\nTwIDAQAB\n-----END PUBLIC KEY-----\n",
+    "enabled": true
+  }
+}
