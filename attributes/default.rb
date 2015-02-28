@@ -34,3 +34,24 @@ default[:chef_server_populator][:backup][:schedule] = {
   :minute => '33',
   :hour => '3'
 }
+
+# Chef 12 Premium Features, Enable at your own risk, they may cost $$$
+# https://www.chef.io/chef/#plans-and-pricing
+
+default[:chef_server_populator][:premium] = {
+  'opscode-reporting' => {},
+  'opscode-manage' => {
+    :enabled => true,
+    :config => {
+      :disable_sign_up => true
+    },
+    'opscode-analytics' => {},
+    'opscode-push-jobs-server' => {}
+  }
+}
+
+default[:chef_server_populator][:populator_org] = {
+  :name => 'inception_llc',
+  :full_name => 'Chef Inception Organization',
+  :validator_dir => '/etc/chef-server/'
+}
