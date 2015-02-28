@@ -1,4 +1,4 @@
-org = node[:chef_server_validator][:populator_org]
+org = node[:chef_server_populator][:populator_org]
 
 directory org[:validator_dir]
 
