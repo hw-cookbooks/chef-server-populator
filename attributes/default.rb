@@ -53,5 +53,6 @@ default[:chef_server_populator][:premium] = {
 default[:chef_server_populator][:populator_org] = {
   :name => 'inception_llc',
   :full_name => 'Chef Inception Organization',
-  :validator_dir => '/etc/chef-server/'
+  :validator_dir => '/etc/chef-server/',
+  :validator_pub_key => '/tmp/chef-server-setup/validation_pub.pem'
 }
