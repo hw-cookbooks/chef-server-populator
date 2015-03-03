@@ -55,3 +55,11 @@ default[:chef_server_populator][:populator_org] = {
   :full_name => 'Chef Inception Organization',
   :validator_pub_key => '/tmp/chef-server-setup/validation_pub.pem'
 }
+
+default[:chef_server_populator][:populator_user] = {
+  :name => 'populator',
+  :first => 'Populator',
+  :last => 'User',
+  :email => 'user@example.com',
+  :pub_key => '/tmp/chef-server-setup/client_key_pub.pem'
+}
