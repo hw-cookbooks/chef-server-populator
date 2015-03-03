@@ -4,7 +4,7 @@ pass = user[:pass] || SecureRandom.base64
 
 execute 'create populator user' do
   command "chef-server-ctl user-create #{user[:name]} #{user[:first]} #{user[:last]} #{user[:email]} #{pass}"
-  not_if "chef-server-ctl show-user #{user[:name]} | grep '^username: #{user[:name]}$'"
+  not_if "chef-server-ctl user-show #{user[:name]}"
 end
 
 execute 'set populator user key' do
