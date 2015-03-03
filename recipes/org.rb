@@ -11,3 +11,9 @@ end
 execute 'remove populator org default validator key' do
   command "chef-server-ctl delete-client-key #{org[:name]} #{org[:name]}-validator default"
 end
+
+node.set['chef-server'][:configuration][:default_orgname] = node[:chef_server_populator][:populator_org][:name]
+
+chef_server_ingredient 'chef-server-core' do
+  action :reconfigure
+end
