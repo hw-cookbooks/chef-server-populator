@@ -25,3 +25,5 @@ else
 end
 
 include_recipe 'chef-server'
+
+include_recipe 'chef-server-populator::org'
