@@ -15,7 +15,7 @@ default[:chef_server_populator][:servername_override] = nil
 # The :chef_server attribute is passed to chef-server cookbook
 # Default the ttl since it kills runs with 403s on templates with
 # annoying frequency
-default[:chef_server_populator][:chef_server][:configuration][:erchef][:s3_url_ttl] = 3600
+default[:chef_server_populator][:chef_server][:configuration][:opscode_erchef][:s3_url_ttl] = 3600
 
 default[:chef_server_populator][:cookbook_auto_install] = true
 
