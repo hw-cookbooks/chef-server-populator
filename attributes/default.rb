@@ -50,16 +50,21 @@ default[:chef_server_populator][:premium] = {
   }
 }
 
-default[:chef_server_populator][:populator_org] = {
-  :name => 'inception_llc',
-  :full_name => 'Chef Inception Organization',
-  :validator_pub_key => '/tmp/chef-server-setup/validation_pub.pem'
+default[:chef_server_populator][:orgs] = {
+  :populator => {
+    :name => 'inception_llc',
+    :full_name => 'Chef Inception Organization',
+    :validator_pub_key => '/tmp/chef-server/validator_pub.pem'
+  }
 }
 
-default[:chef_server_populator][:populator_user] = {
-  :name => 'populator',
-  :first => 'Populator',
-  :last => 'User',
-  :email => 'user@example.com',
-  :pub_key => '/tmp/chef-server-setup/client_key_pub.pem'
+default[:chef_server_populator][:org_users] = {
+  :populator => {
+    :first => 'Populator',
+    :last => 'User',
+    :email => 'user@example.com',
+    :pub_key => '/tmp/chef-server/client_key_pub.pem'
+  }
 }
+
+default[:chef_server_populator][:default_org] = 'populator'
