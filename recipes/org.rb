@@ -21,8 +21,11 @@ node[:chef_server_populator][:orgs].each do |org, settings|
   end
 
   execute 'create populator org' do
-    command "chef-server-ctl org-create #{settings[:name]} #{settings[:full_name]} -a #{org}"
+    command "chef-server-ctl org-create #{org} #{settings[:full_name]} -a #{org}"
     not_if "chef-server-ctl org-list | grep '^#{settings[:name]}$'"
+    if org == node[:chef_server_populator][:default_org]
+      notifies :reconfigure, 'chef_server_ingredient[chef-server-core]'
+    end
   end
 
   execute 'add populator org validator key' do
@@ -34,11 +37,4 @@ node[:chef_server_populator][:orgs].each do |org, settings|
     command "chef-server-ctl delete-client-key #{settings[:name]} #{settings[:name]}-validator default"
     only_if "chef-server-ctl list-client-keys #{settings[:name]} #{settings[:name]}-validator | grep '^key_name: default$'"
   end
-end
-
-node.set['chef-server'][:configuration][:default_orgname] = node[:chef_server_populator][:default_org]
-
-chef_server_ingredient 'chef-server-core' do
-  action :reconfigure
-  not_if node[:chef_server_populator][:default_org].empty?
 end
