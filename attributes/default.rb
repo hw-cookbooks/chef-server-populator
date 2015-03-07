@@ -65,4 +65,5 @@ default[:chef_server_populator][:org_users] = {
   }
 }
 
-default[:chef_server_populator][:default_org] = 'populator'
+default[:chef_server_populator][:server_org] = 'inception_llc'
+default[:chef_server_populator][:default_org] = default[:chef_server_populator][:server_org]
