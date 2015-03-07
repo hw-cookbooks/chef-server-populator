@@ -53,8 +53,7 @@ default[:chef_server_populator][:premium] = {
 default[:chef_server_populator][:orgs] = {
   :populator => {
     :name => 'inception_llc',
-    :full_name => 'Chef Inception Organization',
-    :validator_pub_key => '/tmp/chef-server/validator_pub.pem'
+    :full_name => 'Chef Inception Organization'
   }
 }
 
@@ -62,8 +61,7 @@ default[:chef_server_populator][:org_users] = {
   :populator => {
     :first => 'Populator',
     :last => 'User',
-    :email => 'user@example.com',
-    :pub_key => '/tmp/chef-server/client_key_pub.pem'
+    :email => 'user@example.com'
   }
 }
 

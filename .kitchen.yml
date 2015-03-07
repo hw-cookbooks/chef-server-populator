@@ -13,7 +13,15 @@ suites:
   - name: default
     run_list:
       - recipe[test]
-      - recipe[chef-server-populator::configurator]
+      - recipe[chef-server-populator]
     attributes:
       chef_server_populator:
         endpoint: localhost
+        orgs:
+          populator:
+            validator_pub_key: validator_pub.pem
+        org_users:
+          populator:
+            pub_key: user_pub.pem
+        clients:
+          test-node: client_key_pub.pem

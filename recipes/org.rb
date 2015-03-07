@@ -1,3 +1,6 @@
+conf_dir = node[:chef_server_populator][:base_path]
+node.set['chef-server'][:configuration][:default_orgname] = node[:chef_server_populator][:default_org]
+
 node[:chef_server_populator][:orgs].each do |org, settings|
   user = node[:chef_server_populator][:org_users][org]
   pass = user[:pass] || SecureRandom.base64
@@ -8,7 +11,7 @@ node[:chef_server_populator][:orgs].each do |org, settings|
   end
 
   execute 'set populator user key' do
-    command "chef-server-ctl add-user-key #{org} #{user[:pub_key]} --key-name populator"
+    command "chef-server-ctl add-user-key #{org} #{conf_dir}/#{user[:pub_key]} --key-name populator"
     not_if "chef-server-ctl list-user-keys #{org} | grep '^key_name: populator$'"
   end
 
@@ -23,7 +26,7 @@ node[:chef_server_populator][:orgs].each do |org, settings|
   end
 
   execute 'add populator org validator key' do
-    command "chef-server-ctl add-client-key #{settings[:name]} #{settings[:name]}-validator #{settings[:validator_pub_key]} --key-name populator"
+    command "chef-server-ctl add-client-key #{settings[:name]} #{settings[:name]}-validator #{conf_dir}/#{settings[:validator_pub_key]} --key-name populator"
     not_if "chef-server-ctl list-client-keys #{settings[:name]} #{settings[:name]}-validator | grep '^key_name: populator$'"
   end
 
