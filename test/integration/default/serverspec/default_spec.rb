@@ -23,7 +23,7 @@ describe 'chef-server-org-creation' do
     its(:stdout) { should match /pivotal\npopulator/ }
   end
 
-  describe command('chef-server-ctl list-client-keys populator populator') do
+  describe command('chef-server-ctl list-client-keys inception_llc populator') do
     its(:stdout) { should match /populator/ }
   end
 
