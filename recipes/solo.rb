@@ -10,7 +10,7 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
     not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
     retries 5
   end
-  if(pub_key && File.directory?(node[:chef_server_populator][:base_path]))
+  if(pub_key && node[:chef_server_populator][:base_path])
     pub_key_path = File.join(node[:chef_server_populator][:base_path], pub_key)
     execute "remove default public key for #{client}" do
       command "chef-server-ctl delete-client-key #{node[:chef_server_populator][:server_org]} #{client} default"
