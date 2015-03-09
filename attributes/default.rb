@@ -51,14 +51,14 @@ default[:chef_server_populator][:premium] = {
 }
 
 default[:chef_server_populator][:orgs] = {
-  :populator => {
-    :name => 'inception_llc',
+  :inception_llc => {
     :full_name => 'Chef Inception Organization'
   }
 }
 
 default[:chef_server_populator][:org_users] = {
-  :populator => {
+  :inception_llc => {
+    :name => 'populator',
     :first => 'Populator',
     :last => 'User',
     :email => 'user@example.com'
