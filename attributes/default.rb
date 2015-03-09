@@ -61,7 +61,7 @@ default[:chef_server_populator][:org_users] = {
     :name => 'populator',
     :first => 'Populator',
     :last => 'User',
-    :email => 'user@example.com'
+    :email => 'pop@hw-ops.com'
   }
 }
 
