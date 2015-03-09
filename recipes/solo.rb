@@ -16,7 +16,7 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
       command "chef-server-ctl delete-client-key #{node[:chef_server_populator][:server_org]} #{client} default"
     end
     execute "set public key for: #{client}" do
-      command "chef-server-ctl add-client-key #{node[:chef_server_populator][:server_org]} #{client} #{pub_key_path} --key-name default"
+      command "chef-server-ctl add-client-key #{node[:chef_server_populator][:server_org]} #{client} #{pub_key_path} --key-name populator"
     end
   end
 end
