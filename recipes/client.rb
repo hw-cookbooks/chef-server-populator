@@ -1,10 +1,10 @@
 include_recipe 'chef-server-populator::configurator'
 
 case version = node[:chef_server][:version].to_i
+when version >= 12 || version = 0
+  include_recipe 'chef-server-populator::org'
 when version < 12
   node.set[:chef_server_populator][:populator_org] = nil
-when version >= 12
-  include_recipe 'chef-server-populator::org'
 end
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
