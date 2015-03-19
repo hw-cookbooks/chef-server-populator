@@ -2,11 +2,10 @@ include_recipe 'chef-server-populator::configurator'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
 knife_opts = "-s https://127.0.0.1/#{node[:chef_server_populator][:populator_org]} -c /etc/opscode/pivotal.rb"
-pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 node[:chef_server_populator][:clients].each do |client, pub_key|
   execute "create client: #{client}" do
-    command "#{knife_cmd} client create #{client} --admin -d #{knife_opts} > /dev/null"
+    command "#{knife_cmd} client create #{client} --admin -d #{knife_opts} > /dev/null 2>&1"
     not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
     retries 5
   end
