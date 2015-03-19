@@ -19,11 +19,9 @@ suites:
     attributes:
       chef_server_populator:
         endpoint: localhost
-        orgs:
-          inception_llc:
-            validator_pub_key: validator_pub.pem
+        solo_org:
+          validator_pub_key: validator_pub.pem
         org_users:
-          inception_llc:
-            pub_key: user_pub.pem
+          pub_key: user_pub.pem
         clients:
           test-node: client_key_pub.pem
