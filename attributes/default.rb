@@ -35,34 +35,18 @@ default[:chef_server_populator][:backup][:schedule] = {
   :hour => '3'
 }
 
-# Chef 12 Premium Features, Enable at your own risk, they may cost $$$
-# https://www.chef.io/chef/#plans-and-pricing
-
-default[:chef_server_populator][:premium] = {
-  'opscode-reporting' => {},
-  'opscode-manage' => {
-    :enabled => true,
-    :config => {
-      :disable_sign_up => true
-    },
-    'opscode-analytics' => {},
-    'opscode-push-jobs-server' => {}
-  }
+default[:chef_server_populator][:solo_org] = {
+  :org_name => 'inception_llc',
+  :full_name => 'Chef Inception Organization',
+  :validator_pub_key => 'validator_pub.pem'
 }
 
-default[:chef_server_populator][:orgs] = {
-  :inception_llc => {
-    :full_name => 'Chef Inception Organization'
-  }
-}
-
-default[:chef_server_populator][:org_users] = {
-  :inception_llc => {
-    :name => 'populator',
-    :first => 'Populator',
-    :last => 'User',
-    :email => 'pop@hw-ops.com'
-  }
+default[:chef_server_populator][:solo_org_user] = {
+  :name => 'populator',
+  :first => 'Populator',
+  :last => 'User',
+  :email => 'pop@hw-ops.com',
+  :pub_key => 'user_pub.pem'
 }
 
 default[:chef_server_populator][:server_org] = 'inception_llc'
