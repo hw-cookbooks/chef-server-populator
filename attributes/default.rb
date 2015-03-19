@@ -19,9 +19,6 @@ default[:chef_server_populator][:chef_server][:configuration][:opscode_erchef][:
 
 default[:chef_server_populator][:cookbook_auto_install] = true
 
-# ref: https://tickets.opscode.com/browse/CHEF-3838
-default[:chef_server_populator][:force_init] = false # upstart or sysvinit
-
 default[:chef_server_populator][:restore][:file] = ''
 default[:chef_server_populator][:restore][:data] = ''
 default[:chef_server_populator][:restore][:local_path] = '/tmp/'
