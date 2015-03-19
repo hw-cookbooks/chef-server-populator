@@ -98,7 +98,7 @@ directory '/etc/opscode'
 
 file '/etc/opscode/restore.json' do
   content JSONCompat.to_json_pretty(
-                                    :date => Time.now.to_i,
-                                    :file => file
-                                    )
+    :date => Time.now.to_i,
+     :file => file
+  )
 end
