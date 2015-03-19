@@ -25,11 +25,18 @@ if(node[:chef_server_populator][:databag])
       first_name = full_name.split(' ').first
       last_name = full_name.split(' ').last
       email = item.fetch('email', "#{client}@null.com")
-      org = item['chef_server'].fetch('org', nil)
+      orgs = item['chef_server'].fetch('orgs', {})
+      org, options = orgs.first
       if(org)
         knife_url = "-s https://127.0.0.1/organizations/#{org}"
       else
         knife_url = "-s https://127.0.0.1"
+      end
+      if(options.has_key?('enabled'))
+        enabled = options[:enabled]
+      end
+      if(options.has_key?('admin'))
+        admin = options[:admin]
       end
       if(item['enabled'] == false)
         if(types.include?('client'))
