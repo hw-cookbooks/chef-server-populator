@@ -19,95 +19,86 @@ else
   data = node[:chef_server_populator][:restore][:data]
 end
 
-file '/etc/chef/client.pem' do
-  action :nothing
-end
-
-ruby_block 'set admin public key' do
-  block do
-    execute_r = run_context.resource_collection.find(:execute => 'update local client')
-    execute_r.command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\""
-  end
-end
-
 execute 'backup chef server stop' do
   command 'chef-server-ctl stop erchef'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'backup chef server bookshelf stop' do
   command 'chef-server-ctl stop bookshelf'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 #Drop and Restore entire chef database from file
 execute 'dropping chef database' do
-  command '/opt/chef-server/embedded/bin/dropdb opscode_chef'
+  command '/opt/opscode/embedded/bin/dropdb opscode_chef'
   user 'opscode-pgsql'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restoring chef data' do
-  command "/opt/chef-server/embedded/bin/pg_restore --create --dbname=postgres #{file}"
+  command "/opt/opscode/embedded/bin/pg_restore --create --dbname=postgres #{file}"
   user 'opscode-pgsql'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 %w( opscode-pgsql opscode_chef opscode_chef_ro ).each do |pg_role|
   execute "set #{pg_role} db permissions" do
-    command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c 'GRANT TEMPORARY, CREATE, CONNECT ON DATABASE opscode_chef TO \"#{pg_role}\"'"
+    command "/opt/opscode/embedded/bin/psql -d opscode_chef -c 'GRANT TEMPORARY, CREATE, CONNECT ON DATABASE opscode_chef TO \"#{pg_role}\"'"
     user 'opscode-pgsql'
-    creates '/etc/chef-server/restore.json'
+    creates '/etc/opscode/restore.json'
   end
 end
 
 execute 'remove existing bookshelf data' do
-  command "rm -rf /var/opt/chef-server/bookshelf/data/"
-  creates '/etc/chef-server/restore.json'
+  command "rm -rf /var/opt/opscode/bookshelf/data/"
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restore bookshelf data' do
-  command "tar xzf #{data} -C /var/opt/chef-server/bookshelf/"
-  creates '/etc/chef-server/restore.json'
+  command "tar xzf #{data} -C /var/opt/opscode/bookshelf/"
+  creates '/etc/opscode/restore.json'
 end
 
-execute 'update local client' do
-  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\""
+execute 'update local superuser cert' do
+  command lazy{
+    pivotal_cert = File.read('/etc/opscode/pivotal.cert')
+    "/opt/opscode/embedded/bin/psql -d opscode_chef -c \"update users set public_key=E'#{pivotal_cert}' where username='pivotal'\""
+  }
   user 'opscode-pgsql'
-  creates '/etc/chef-server/restore.json'
-  notifies :delete, 'file[/etc/chef/client.pem]'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server bookshelf start' do
   command 'chef-server-ctl start bookshelf'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server start' do
   command 'chef-server-ctl start erchef'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server wait for erchef' do
   command 'sleep 10'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server reindex' do
   command 'chef-server-ctl reindex'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server restart' do
   command 'chef-server-ctl restart'
-  creates '/etc/chef-server/restore.json'
+  creates '/etc/opscode/restore.json'
 end
 
-directory '/etc/chef-server'
+directory '/etc/opscode'
 
-file '/etc/chef-server/restore.json' do
+file '/etc/opscode/restore.json' do
   content JSONCompat.to_json_pretty(
-    :date => Time.now.to_i,
-    :file => file
-  )
+                                    :date => Time.now.to_i,
+                                    :file => file
+                                    )
 end
