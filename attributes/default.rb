@@ -46,7 +46,7 @@ default[:chef_server_populator][:solo_org_user] = {
   :name => 'populator',
   :first => 'Populator',
   :last => 'User',
-  :email => 'pop@hw-ops.com',
+  :email => 'pop@example.com',
   :pub_key => 'user_pub.pem'
 }
 
