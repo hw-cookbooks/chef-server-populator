@@ -24,7 +24,7 @@ if(node[:chef_server_populator][:databag])
       full_name = item.fetch('full_name', client.capitalize)
       first_name = full_name.split(' ').first
       last_name = full_name.split(' ').last
-      email = item.fetch('email', "#{client}@null.com")
+      email = item.fetch('email', "#{client}@example.com")
       orgs = item['chef_server'].fetch('orgs', {})
       org, options = orgs.first
       if(org)
