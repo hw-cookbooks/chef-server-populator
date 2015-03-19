@@ -32,11 +32,13 @@ if(node[:chef_server_populator][:databag])
       else
         knife_url = "-s https://127.0.0.1"
       end
-      if(options.has_key?('enabled'))
-        enabled = options[:enabled]
-      end
-      if(options.has_key?('admin'))
-        admin = options[:admin]
+      if(options)
+        if(options.has_key?('enabled'))
+          enabled = options[:enabled]
+        end
+        if(options.has_key?('admin'))
+          admin = options[:admin]
+        end
       end
       if(item['enabled'] == false)
         if(types.include?('client'))
