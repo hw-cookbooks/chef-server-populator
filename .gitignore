@@ -1,0 +1,6 @@
+.kitchen/
+.kitchen.local.yml
+.librarian/
+tmp/
+cookbooks
+Gemfile.lock

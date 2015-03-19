@@ -4,7 +4,7 @@ require 'fog'
 require 'multi_json'
 require 'mixlib/shellout'
 
-DEFAULT_CONFIGURATION_PATH = '/etc/chef-server/populator/backup.json'
+DEFAULT_CONFIGURATION_PATH = '/etc/opscode/populator/backup.json'
 
 if(ARGV.size > 1 || (ARGV.first && !File.exists?(ARGV.first.to_s)))
   puts 'Usage: chef-server-backup CONFIG_FILE_PATH'
@@ -19,7 +19,7 @@ else
 end
 
 server_manifest = MultiJson.load(
-  File.read('/opt/chef-server/version-manifest.json'),
+  File.read('/opt/opscode/version-manifest.json'),
   :symbolize_keys => true
 )
 
@@ -46,7 +46,7 @@ stop_service.error!
 
 begin
   backup = Mixlib::ShellOut.new([
-      '/opt/chef-server/embedded/bin/pg_dump',
+      '/opt/opscode/embedded/bin/pg_dump',
       "opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}"
     ].join(' '),
     :user => 'opscode-pgsql'
@@ -56,7 +56,7 @@ begin
   backup.error!
 
   backup_data = Mixlib::ShellOut.new(
-    "tar -czf #{data_file} -C /var/opt/chef-server/bookshelf data"
+    "tar -czf #{data_file} -C /var/opt/opscode/bookshelf data"
   )
   backup_data.run_command
   backup_data.error!

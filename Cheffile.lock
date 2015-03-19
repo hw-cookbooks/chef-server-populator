@@ -1,0 +1,24 @@
+SITE
+  remote: https://supermarket.getchef.com/api/v1
+  specs:
+    chef-server (3.0.1)
+      chef-server-ingredient (>= 0.0.0)
+    chef-server-ingredient (0.2.0)
+      packagecloud (>= 0.0.0)
+    packagecloud (0.0.17)
+
+PATH
+  remote: .
+  specs:
+    chef-server-populator (0.4.1)
+      chef-server (>= 2.1.0)
+
+PATH
+  remote: test/fixtures/cookbooks
+  specs:
+    test (0.1.0)
+
+DEPENDENCIES
+  chef-server-populator (>= 0)
+  test (>= 0)
+

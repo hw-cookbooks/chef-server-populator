@@ -1,25 +1,23 @@
 include_recipe 'chef-server-populator::configurator'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
-knife_opts = "-k #{node[:chef_server_populator][:pem]} " <<
-  "-u #{node[:chef_server_populator][:user]} " <<
-  "-s https://127.0.0.1"
-pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
+knife_opts = "-s https://127.0.0.1/#{node[:chef_server_populator][:populator_org]} -c /etc/opscode/pivotal.rb"
 
 node[:chef_server_populator][:clients].each do |client, pub_key|
   execute "create client: #{client}" do
-    command "#{knife_cmd} client create #{client} --admin -d #{knife_opts}"
+    command "#{knife_cmd} client create #{client} --admin -d #{knife_opts} > /dev/null 2>&1"
     not_if "#{knife_cmd} client list #{knife_opts}| tr -d ' ' | grep '^#{client}$'"
     retries 5
   end
-  if(pub_key && File.directory?(node[:chef_server_populator][:base_path]))
+  if(pub_key && node[:chef_server_populator][:base_path])
     pub_key_path = File.join(node[:chef_server_populator][:base_path], pub_key)
-    if(File.exists?(pub_key_path))
-      pub_key_con = File.read(pub_key_path)
-      execute "set public key for: #{client}" do
-        command "#{pg_cmd} -c \"update clients set public_key = E'#{pub_key_con}' where name = '#{client}'\""
-        user 'opscode-pgsql'
-      end
+    execute "remove default public key for #{client}" do
+      command "chef-server-ctl delete-client-key #{node[:chef_server_populator][:server_org]} #{client} default"
+      only_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #client | grep '^key_name: default$'"
+    end
+    execute "set public key for: #{client}" do
+      command "chef-server-ctl add-client-key #{node[:chef_server_populator][:server_org]} #{client} #{pub_key_path} --key-name populator"
+      not_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #client | grep '^key_name: populator$'"
     end
   end
 end
