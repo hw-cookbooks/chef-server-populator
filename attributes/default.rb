@@ -35,6 +35,10 @@ default[:chef_server_populator][:backup][:schedule] = {
   :hour => '3'
 }
 
+#The following attributes are provided as examples. In almost every
+#imaginable case you will want to replace some or all of these with
+#your own values.
+
 default[:chef_server_populator][:solo_org] = {
   :org_name => 'inception_llc',
   :full_name => 'Chef Inception Organization',
@@ -50,4 +54,5 @@ default[:chef_server_populator][:solo_org_user] = {
 }
 
 default[:chef_server_populator][:server_org] = 'inception_llc'
-default[:chef_server_populator][:default_org] = default[:chef_server_populator][:server_org]
+#If this is set to nil, the configurator recipe will set it to the server_org.
+default[:chef_server_populator][:default_org] = nil 
