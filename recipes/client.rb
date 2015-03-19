@@ -50,7 +50,7 @@ if(node[:chef_server_populator][:databag])
           execute "remove user: #{client} from #{org}" do
             command "chef-server-ctl org-user-remove #{org} #{client}"
           end
-            execute "delete user: #{client}" do
+          execute "delete user: #{client}" do
             command "chef-server-ctl user-delete #{client}"
             only_if "chef-server-list user-list | tr -d ' ' | grep '^#{client}$'"
           end
@@ -105,7 +105,7 @@ if(node[:chef_server_populator][:databag])
 
         if(types.include?('user'))
           execute "create user: #{client}" do
-            command "chef-server-ctl user-create #{client} #{first_name} #{last_name} #{email} #{password} > /dev/null"
+            command "chef-server-ctl user-create #{client} #{first_name} #{last_name} #{email} #{password} > /dev/null 2>&1"
             not_if "chef-server-ctl user-list | grep '^#{client}$'"
           end
           if(pub_key)
