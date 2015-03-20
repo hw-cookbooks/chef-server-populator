@@ -5,7 +5,7 @@ recreating Chef Server nodes. Provides backup and restore recipes for
 complete Chef Server recovery.
 
 ### New Chef 12 Support
-Chef 12 is supported in version 0.5 and above. If you need Chef 11
+Chef 12 is supported in version 1.0 and above. If you need Chef 11
 support, please pin your environment to version 0.4.0.
 
 ### Usage

@@ -1,3 +1,12 @@
+## v1.0.0
+* Updates to support Chef 12
+* Removes support for Chef 11
+* Adds support for organization creation in solo and client contexts
+* Updates backup/restore recipes for new psql path and new table &
+field names. (Not fully tested)
+* Replaces many knife and psql commands with native chef-server-clt
+management commands
+
 ## v0.4.0
 * Allow for creation of clients, users, or both
 * Store backup configuration in separate JSON file
