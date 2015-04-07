@@ -1,3 +1,7 @@
+## v1.0.2
+* Org recipe only included for solo run, since client run expects data
+bag items.
+
 ## v1.0.0
 * Updates to support Chef 12
 * Removes support for Chef 11
