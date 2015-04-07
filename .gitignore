@@ -4,3 +4,4 @@
 tmp/
 cookbooks
 Gemfile.lock
+Cheffile.lock
