@@ -36,7 +36,7 @@ Structure of the data bag item:
 User: 
 ```json
 {
-  "id": user_name",
+  "id": "user_name",
   "full_name": "User Name",
   "email": "name@domain.tld",
   "chef_server": {
@@ -60,11 +60,11 @@ that is defined in the data bag.
 Client:
 ```json
 {
-  "id": client_name",
+  "id": "client_name",
   "chef_server": {
     "client_key": "public key contents",
     "type": [
-      client"
+      "client"
     ],
     "orgs": [ "organization" ]
    } 
@@ -78,7 +78,7 @@ hash as in the User example.
 Org:
 ```json
 {
-  "id": org_name",
+  "id": "org_name",
   "full_name": "Organization Name",
   "chef_server": {
     "client_key": "public key contents",
