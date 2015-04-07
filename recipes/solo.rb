@@ -1,5 +1,11 @@
 include_recipe 'chef-server-populator::configurator'
 
+if(node[:chef_server_populator][:default_org].nil?)
+  node.default[:chef_server_populator][:default_org] = node[:chef_server_populator][:server_org]
+end
+
+include_recipe 'chef-server-populator::org'
+
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
 knife_opts = "-s https://127.0.0.1/#{node[:chef_server_populator][:populator_org]} -c /etc/opscode/pivotal.rb"
 
