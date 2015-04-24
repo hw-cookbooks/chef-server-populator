@@ -89,7 +89,7 @@ Org:
   }
 }
 ```
-Note: Creating the org will create a client called <org>-validator which uses the public key specified when 
+Note: Creating the org will create a client called `<org>-validator` which uses the public key specified when 
 creating the org.
 
 **Restoring from a backup:**
