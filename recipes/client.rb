@@ -78,12 +78,12 @@ if(node[:chef_server_populator][:databag])
           end
           execute 'add org validator key' do
             command "chef-server-ctl add-client-key #{client} #{client}-validator #{key_file} --key-name populator"
-            only_if pub_key
-            not_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep '^key_name: populator$'"
+            only_if { pub_key }
+            not_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep '^name: populator$'"
           end
           execute 'remove org default validator key' do
             command "chef-server-ctl delete-client-key #{client} #{client}-validator default"
-            only_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep '^key_name: default$'"
+            only_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep '^name: default$'"
           end
         end
 
@@ -96,11 +96,11 @@ if(node[:chef_server_populator][:databag])
           if(pub_key)
             execute "set client key: #{client}" do
               command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{client} #{key_file} --key-name populator"
-              not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{client} | grep '^key_name: populator$'"
+              not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{client} | grep '^name: populator$'"
             end
             execute "delete default client key: #{client}" do
               command "chef-server-ctl delete-client-key #{org || node[:chef_server_populator][:default_org]} #{client} default"
-              only_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{client} | grep '^key_name: default$'"
+              only_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{client} | grep '^name: default$'"
             end
           end
         end
@@ -113,11 +113,11 @@ if(node[:chef_server_populator][:databag])
           if(pub_key)
             execute "set user key: #{client}" do
               command "chef-server-ctl add-user-key #{client} #{key_file} --key-name populator"
-              not_if "chef-server-ctl list-user-keys #{client} | grep '^key_name: populator$'"
+              not_if "chef-server-ctl list-user-keys #{client} | grep '^name: populator$'"
             end
             execute "delete default user key: #{client}" do
               command "chef-server-ctl delete-user-key #{client} default"
-              only_if "chef-server-ctl list-user-keys #{client} | grep '^key_name: default$'"
+              only_if "chef-server-ctl list-user-keys #{client} | grep '^name: default$'"
             end
           end
           execute "set user org: #{client}" do
