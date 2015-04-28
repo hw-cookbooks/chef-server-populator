@@ -20,7 +20,7 @@ end
 end
 
 node[:chef_server_populator][:backup_gems].keys.each do |gem_name, gem_version|
-  gem_package g do
+  gem_package gem_name do
     if gem_version
       version gem_version
     end
