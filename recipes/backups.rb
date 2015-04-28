@@ -19,9 +19,12 @@ end
   end
 end
 
-gem_package 'fog' do
-  only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
-  retries 2
+node[:chef_server_populator][:backup_gems].keys.each do |g|
+  gem_package g do
+    version node[:chef_server_populator][:backup_gems][g]
+    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
+    retries 2
+  end
 end
 
 directory node[:chef_server_populator][:configuration_directory] do
