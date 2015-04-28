@@ -40,7 +40,7 @@ data_file = File.join(
 )
 
 # stop server
-stop_service = Mixlib::ShellOut.new('chef-server-ctl stop')
+stop_service = Mixlib::ShellOut.new('chef-server-ctl stop erchef')
 stop_service.run_command
 stop_service.error!
 
