@@ -19,9 +19,11 @@ end
   end
 end
 
-node[:chef_server_populator][:backup_gems].keys.each do |g|
+node[:chef_server_populator][:backup_gems].keys.each do |gem_name, gem_version|
   gem_package g do
-    version node[:chef_server_populator][:backup_gems][g]
+    if gem_version
+      version gem_version
+    end
     only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
     retries 2
   end
