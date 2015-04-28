@@ -79,13 +79,12 @@ if(remote_creds)
     remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds)
     directory = remote.buckets.get(remote_directory)
     [db_file, data_file].each do |file|
-      remote_file = Miasma::Models::Storage::File.new(directory)
-      remote_file.name = File.basename(file)
-      remote_file.body = File.open(file, 'r')
-      remote_file.save
-
-      remote_file.name = "latest#{File.extname(file)}"
-      remote_file.save
+      [ :date_stamped, :latest ].each do |type|
+        remote_file = Miasma::Models::Storage::File.new(directory)
+        remote_file.name = type == :date_stamped ? File.basename(file) : "latest#{File.extname(file)}"
+        remote_file.body = File.open(file, 'r')
+        remote_file.save
+      end
     end
   else
     $stderr.puts 'ERROR: No remote directory defined for backup storage!'
