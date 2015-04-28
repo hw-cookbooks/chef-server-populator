@@ -43,8 +43,8 @@ file File.join(node[:chef_server_populator][:configuration_directory], 'backup.j
   mode 0600
 end
 
-cookbook_file '/usr/local/bin/chef-server-backup' do
-  source 'chef-server-backup.rb'
+template '/usr/local/bin/chef-server-backup' do
+  source 'chef-server-backup.rb.erb'
   mode '0700'
   retries 3
 end
