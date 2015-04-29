@@ -79,28 +79,23 @@ execute 'update local superuser public key cert' do
   creates '/etc/opscode/restore.json'
 end
 
-execute 'restore chef server bookshelf start' do
-  command 'chef-server-ctl start bookshelf'
+execute 'restore chef server restart' do
+  command 'chef-server-ctl restart'
   creates '/etc/opscode/restore.json'
 end
 
-execute 'restore chef server start' do
-  command 'chef-server-ctl start opscode-erchef'
+execute 'restore restart all chef-server services' do
+  command 'chef-server-ctl restart'
   creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server wait for opscode-erchef' do
-  command 'sleep 10'
+  command 'sleep 30'
   creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server reindex' do
   command lazy { "chef-server-ctl reindex #{node[:chef_server_populator][:default_org]}" }
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore chef server restart' do
-  command 'chef-server-ctl restart'
   creates '/etc/opscode/restore.json'
 end
 
