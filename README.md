@@ -10,7 +10,7 @@ support, please pin your environment to version 0.4.0.
 
 ### Usage
 
-When bootstrapping with the chef-server cookbook and chef-solo:
+**When bootstrapping with the chef-server cookbook and chef-solo:**
 
 * Download and unpack chef-server, chef-server-ingredient, packagecloud, and chef-server-populator cookbooks
 * Upload public keys to be used by users, org-validator, and clients (optionally)
@@ -21,7 +21,7 @@ See the `default[:chef_server_populator][:solo_org]` and
 `default[:chef_server_populator][:solo_org_user]` attribute hashes in
 `attributes/default.rb` for the required attribute structure.
 
-When converging with chef-client:
+**When converging with chef-client:**
 
 * Create data bag to hold data bag items with user, org, and client information
 * Create data bag items with user, org, and client information
@@ -89,18 +89,41 @@ Org:
   }
 }
 ```
-Restoring from a backup:
+Note: Creating the org will create a client called `<org>-validator` which uses the public key specified when 
+creating the org.
+
+**Restoring from a backup:**
 
 * Set path to restore file with node[:chef_server_populator][:restore][:file]
 * The restore recipe is run if a restore file is set
 * The restore file can be remote or local
 
-When enabling backups:
+**When enabling backups:**
 
 * Include chef-server-populator::restore recipe
 * Set backup cron interval with node[:chef_server_populator][:schedule]
 * Optionally set a remote storage location with node[:chef_server_populator][:backup][:remote][:connection]
 * Backups include both a pg_dump of the entire chef database and a tarball of the bookshelf data directory
+
+## Public Key Format
+
+The format of the public key specified with the json object needs to be a single line string with new lines
+represented with the \n character
+
+You can use one of the below commands to convert your public key file into the correct string format (credit
+to the certificates cookbook for these)
+```
+cat <filename> | sed s/$/\\\\n/ | tr -d '\n'
+-OR-
+/usr/bin/env ruby -e 'p ARGF.read' <filename>
+-OR-
+perl -pe 's!(\x0d)?\x0a!\\n!g' <filename>
+```
+If you need to obtain the public key string for your private key first, then run the following on the .pem
+file containing the private key
+```
+openssl rsa -in <path_to_keyfile>.pem -pubout
+```
 
 ## Extras
 
