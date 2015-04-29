@@ -37,7 +37,7 @@ execute 'dropping chef database' do
 end
 
 execute 'restoring chef data' do
-  command "/opt/opscode/embedded/bin/pg_restore --create --dbname=postgres #{file}"
+  command "/opt/opscode/embedded/bin/psql -f #{file} postgres"
   user 'opscode-pgsql'
   creates '/etc/opscode/restore.json'
 end
