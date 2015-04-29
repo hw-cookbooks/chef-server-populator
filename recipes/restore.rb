@@ -20,71 +20,33 @@ else
 end
 
 execute 'backup chef server stop' do
-  command 'chef-server-ctl stop opscode-erchef'
+  command 'chef-server-ctl stop'
   creates '/etc/opscode/restore.json'
 end
 
-execute 'backup chef server bookshelf stop' do
-  command 'chef-server-ctl stop bookshelf'
+execute 'restore chef server start postgres' do
+  command 'chef-server-ctl start postgresql'
   creates '/etc/opscode/restore.json'
 end
 
 #Drop and Restore entire chef database from file
-execute 'dropping chef database' do
-  command '/opt/opscode/embedded/bin/dropdb opscode_chef'
-  user 'opscode-pgsql'
-  creates '/etc/opscode/restore.json'
-end
-
 execute 'restoring chef data' do
   command "/opt/opscode/embedded/bin/psql -f #{file} postgres"
   user 'opscode-pgsql'
   creates '/etc/opscode/restore.json'
 end
 
-%w( opscode-pgsql opscode_chef opscode_chef_ro ).each do |pg_role|
-  execute "set #{pg_role} db permissions" do
-    command "/opt/opscode/embedded/bin/psql -d opscode_chef -c 'GRANT TEMPORARY, CREATE, CONNECT ON DATABASE opscode_chef TO \"#{pg_role}\"'"
-    user 'opscode-pgsql'
-    creates '/etc/opscode/restore.json'
-  end
-end
-
-execute 'remove existing bookshelf data' do
-  command "rm -rf /var/opt/opscode/bookshelf/data/"
+execute 'remove existing data' do
+  command "rm -rf /var/opt/opscode /etc/opscode"
   creates '/etc/opscode/restore.json'
 end
 
-execute 'restore bookshelf data' do
-  command "tar xzf #{data} -C /var/opt/opscode/bookshelf/ data"
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore private-chef-secrets.json' do
-  command "tar xzf #{data} -C /etc/opscode/ private-chef-secrets.json"
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'generate public key certificate for superuser' do
-  command "openssl rsa -in /etc/opscode/pivotal.pem -pubout -out /etc/opscode/pivotal_pub.pem"
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'update local superuser public key cert' do
-  command lazy{
-    pivotal_cert = File.read('/etc/opscode/pivotal_pub.pem')
-    "/opt/opscode/embedded/bin/psql -d opscode_chef -c \"update users set public_key=E'#{pivotal_cert}' where username='pivotal'\""
-  }
-  user 'opscode-pgsql'
+execute 'restore tarball data' do
+  command "tar xzf #{data} -C /"
   creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server restart' do
-  command 'chef-server-ctl restart'
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore restart all chef-server services' do
   command 'chef-server-ctl restart'
   creates '/etc/opscode/restore.json'
 end

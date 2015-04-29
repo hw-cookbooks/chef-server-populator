@@ -57,7 +57,7 @@ begin
 
 
   backup_data = Mixlib::ShellOut.new(
-    "tar -czf #{data_file} -C /var/opt/opscode/bookshelf data -C /etc/opscode private-chef-secrets.json"
+    "tar -czf #{data_file} /var/opt/opscode /etc/opscode"
   )
   backup_data.run_command
   backup_data.error!
