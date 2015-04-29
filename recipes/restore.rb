@@ -62,7 +62,7 @@ end
 
 execute 'update local superuser cert' do
   command lazy{
-    pivotal_cert = File.read('/etc/opscode/pivotal.cert')
+    pivotal_cert = File.read('/etc/opscode/pivotal.pem')
     "/opt/opscode/embedded/bin/psql -d opscode_chef -c \"update users set public_key=E'#{pivotal_cert}' where username='pivotal'\""
   }
   user 'opscode-pgsql'
