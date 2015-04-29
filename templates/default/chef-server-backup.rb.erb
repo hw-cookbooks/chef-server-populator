@@ -39,13 +39,6 @@ data_file = File.join(
   "#{prefix}.tgz"
 )
 
-temp_dir = File.join(
-  config[:dir],
-  'backup'
-)
-
-Dir.mkdir(temp_dir)
-
 # stop services that write data we're backing up
 %w( bookshelf opscode-erchef ).each do |svc|
   stop_service = Mixlib::ShellOut.new("chef-server-ctl stop #{svc}")
@@ -55,7 +48,8 @@ end
 
 begin
   backup = Mixlib::ShellOut.new(
-      "/opt/opscode/embedded/bin/pg_dumpall -c -f #{db_file}"
+      "/opt/opscode/embedded/bin/pg_dumpall -c -f #{db_file}",
+      :user => 'opscode-pgsql'
   )
 
   backup.run_command
