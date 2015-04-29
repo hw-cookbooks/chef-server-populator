@@ -85,7 +85,7 @@ execute 'restore chef server wait for opscode-erchef' do
 end
 
 execute 'restore chef server reindex' do
-  command 'chef-server-ctl reindex'
+  command lazy { "chef-server-ctl reindex #{node[:chef_server_populator][:default_org]}" }
   creates '/etc/opscode/restore.json'
 end
 
