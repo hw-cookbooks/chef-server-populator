@@ -60,9 +60,14 @@ execute 'restore bookshelf data' do
   creates '/etc/opscode/restore.json'
 end
 
-execute 'update local superuser cert' do
+execute 'generate public key certificate for superuser' do
+  command "openssl rsa -in /etc/opscode/pivotal.pem -pubout -out /etc/opscode/pivotal_pub.pem"
+  creates '/etc/opscode/restore.json'
+end
+
+execute 'update local superuser public key cert' do
   command lazy{
-    pivotal_cert = File.read('/etc/opscode/pivotal.pem')
+    pivotal_cert = File.read('/etc/opscode/pivotal_pub.pem')
     "/opt/opscode/embedded/bin/psql -d opscode_chef -c \"update users set public_key=E'#{pivotal_cert}' where username='pivotal'\""
   }
   user 'opscode-pgsql'
