@@ -56,7 +56,12 @@ execute 'remove existing bookshelf data' do
 end
 
 execute 'restore bookshelf data' do
-  command "tar xzf #{data} -C /var/opt/opscode/bookshelf/"
+  command "tar xzf #{data} -C /var/opt/opscode/bookshelf/ data"
+  creates '/etc/opscode/restore.json'
+end
+
+execute 'restore private-chef-secrets.json' do
+  command "tar xzf #{data} -C /etc/opscode/ private-chef-secrets.json"
   creates '/etc/opscode/restore.json'
 end
 

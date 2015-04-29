@@ -39,6 +39,13 @@ data_file = File.join(
   "#{prefix}.tgz"
 )
 
+temp_dir = File.join(
+  config[:dir],
+  'backup'
+)
+
+Dir.mkdir(temp_dir)
+
 # stop services that write data we're backing up
 %w( bookshelf opscode-erchef ).each do |svc|
   stop_service = Mixlib::ShellOut.new("chef-server-ctl stop #{svc}")
@@ -47,18 +54,16 @@ data_file = File.join(
 end
 
 begin
-  backup = Mixlib::ShellOut.new([
-      '/opt/opscode/embedded/bin/pg_dump',
-      "opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}"
-    ].join(' '),
-    :user => 'opscode-pgsql'
+  backup = Mixlib::ShellOut.new(
+      "/opt/opscode/embedded/bin/pg_dumpall -c -f #{db_file}"
   )
 
   backup.run_command
   backup.error!
 
+
   backup_data = Mixlib::ShellOut.new(
-    "tar -czf #{data_file} -C /var/opt/opscode/bookshelf data"
+    "tar -czf #{data_file} -C /var/opt/opscode/bookshelf data -C /etc/opscode private-chef-secrets.json"
   )
   backup_data.run_command
   backup_data.error!
