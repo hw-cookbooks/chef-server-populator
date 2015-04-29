@@ -20,7 +20,7 @@ else
 end
 
 execute 'backup chef server stop' do
-  command 'chef-server-ctl stop erchef'
+  command 'chef-server-ctl stop opscode-erchef'
   creates '/etc/opscode/restore.json'
 end
 
@@ -75,11 +75,11 @@ execute 'restore chef server bookshelf start' do
 end
 
 execute 'restore chef server start' do
-  command 'chef-server-ctl start erchef'
+  command 'chef-server-ctl start opscode-erchef'
   creates '/etc/opscode/restore.json'
 end
 
-execute 'restore chef server wait for erchef' do
+execute 'restore chef server wait for opscode-erchef' do
   command 'sleep 10'
   creates '/etc/opscode/restore.json'
 end
