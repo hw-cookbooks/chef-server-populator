@@ -1,0 +1,10 @@
+{
+  "id": "inception_llc",
+  "chef_server": {
+    "client_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwKOeqn4dK6b+SF7mvc+N\ncSpceoxpkQr+Wu1AShxOD0YenD9aCpzmK5rTKlqT7Ko42q0IrSLAeQHKRGNH9ayI\nLOmRmk2do+fjVpXHSSlraEXKNNFSXXRjlVubDBLGcQ6Qx+GL09g4vVOBwcQb0D/E\nX2+f9owRzbcSJma6bzniWWYbWQEa6g2pB9E/hX5KSKj+byVDgUuc/tJsDXtmL2hS\nyQTUtpC6suxDqltBVxNRrmaIna8eTOGw7RiEmpyeeynvOfbMCDE57m1x6RFdscZT\nBpiJW4pHgbx0QgSU9dWH/kUzG/B76idzQuYZVWDBI987brlzmCU2m5teaez1BWva\neQIDAQAB\n-----END PUBLIC KEY-----",
+    "type": [
+      "org"
+    ],
+    "enabled": true
+  }
+}

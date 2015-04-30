@@ -42,3 +42,16 @@ suites:
           pub_key: user_pub.pem
         clients:
           test-node: client_key_pub.pem
+  - name: data-bag
+    provisioner:
+      name: chef_zero
+    data_bags_path: test/fixtures/data_bags
+    run_list:
+      - recipe[test]
+      - recipe[chef-server-populator]
+    attributes:
+      chef-server:
+        version: 12.0.5-1
+      chef_server_populator:
+        endpoint: localhost
+        databag: chef
