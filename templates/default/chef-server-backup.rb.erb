@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'fog'
+require 'miasma'
 require 'multi_json'
 require 'mixlib/shellout'
 
-DEFAULT_CONFIGURATION_PATH = '/etc/opscode/populator/backup.json'
+DEFAULT_CONFIGURATION_PATH = '<%= node[:chef_server_populator][:configuration_directory] %>/backup.json'
 
 if(ARGV.size > 1 || (ARGV.first && !File.exists?(ARGV.first.to_s)))
   puts 'Usage: chef-server-backup CONFIG_FILE_PATH'
@@ -39,24 +39,25 @@ data_file = File.join(
   "#{prefix}.tgz"
 )
 
-# stop server
-stop_service = Mixlib::ShellOut.new('chef-server-ctl stop')
-stop_service.run_command
-stop_service.error!
+# stop services that write data we're backing up
+%w( bookshelf opscode-erchef ).each do |svc|
+  stop_service = Mixlib::ShellOut.new("chef-server-ctl stop #{svc}")
+  stop_service.run_command
+  stop_service.error!
+end
 
 begin
-  backup = Mixlib::ShellOut.new([
-      '/opt/opscode/embedded/bin/pg_dump',
-      "opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}"
-    ].join(' '),
-    :user => 'opscode-pgsql'
+  backup = Mixlib::ShellOut.new(
+      "/opt/opscode/embedded/bin/pg_dumpall -c -f #{db_file}",
+      :user => 'opscode-pgsql'
   )
 
   backup.run_command
   backup.error!
 
+
   backup_data = Mixlib::ShellOut.new(
-    "tar -czf #{data_file} -C /var/opt/opscode/bookshelf data"
+    "tar -czf #{data_file} /var/opt/opscode /etc/opscode"
   )
   backup_data.run_command
   backup_data.error!
@@ -69,18 +70,22 @@ end
 remote_creds = [:remote, :connection].inject(config) do |memo, key|
   memo[key] || break
 end
+
 remote_directory = [:remote, :directory].inject(config) do |memo, key|
   memo[key] || break
 end
 
 if(remote_creds)
   if(remote_directory)
-    remote = Fog::Storage.new(remote_creds)
-    directory = remote.directories.create(:key => remote_directory)
+    remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds)
+    directory = remote.buckets.get(remote_directory)
     [db_file, data_file].each do |file|
-      name = File.basename(file)
-      directory.files.create(:key => name, :body => open(file))
-      directory.files.create(:key => "latest#{File.extname(file)}", :body => open(file))
+      [ :date_stamped, :latest ].each do |type|
+        remote_file = Miasma::Models::Storage::File.new(directory)
+        remote_file.name = type == :date_stamped ? File.basename(file) : "latest#{File.extname(file)}"
+        remote_file.body = File.open(file, 'r')
+        remote_file.save
+      end
     end
   else
     $stderr.puts 'ERROR: No remote directory defined for backup storage!'

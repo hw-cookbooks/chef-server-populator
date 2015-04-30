@@ -9,6 +9,8 @@ default[:chef_server_populator][:user_databag] = nil
 
 default[:chef_server_populator][:endpoint] = nil
 
+default[:chef_server_populator][:backup_gems][:miasma] = '~> 0.2'
+
 # Deprecated in favor of endpoint
 default[:chef_server_populator][:servername_override] = nil
 

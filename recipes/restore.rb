@@ -20,77 +20,44 @@ else
 end
 
 execute 'backup chef server stop' do
-  command 'chef-server-ctl stop erchef'
+  command 'chef-server-ctl stop'
   creates '/etc/opscode/restore.json'
 end
 
-execute 'backup chef server bookshelf stop' do
-  command 'chef-server-ctl stop bookshelf'
+execute 'restore chef server start postgres' do
+  command 'chef-server-ctl start postgresql'
   creates '/etc/opscode/restore.json'
 end
 
 #Drop and Restore entire chef database from file
-execute 'dropping chef database' do
-  command '/opt/opscode/embedded/bin/dropdb opscode_chef'
-  user 'opscode-pgsql'
-  creates '/etc/opscode/restore.json'
-end
-
 execute 'restoring chef data' do
-  command "/opt/opscode/embedded/bin/pg_restore --create --dbname=postgres #{file}"
+  command "/opt/opscode/embedded/bin/psql -f #{file} postgres"
   user 'opscode-pgsql'
   creates '/etc/opscode/restore.json'
 end
 
-%w( opscode-pgsql opscode_chef opscode_chef_ro ).each do |pg_role|
-  execute "set #{pg_role} db permissions" do
-    command "/opt/opscode/embedded/bin/psql -d opscode_chef -c 'GRANT TEMPORARY, CREATE, CONNECT ON DATABASE opscode_chef TO \"#{pg_role}\"'"
-    user 'opscode-pgsql'
-    creates '/etc/opscode/restore.json'
-  end
-end
-
-execute 'remove existing bookshelf data' do
-  command "rm -rf /var/opt/opscode/bookshelf/data/"
+execute 'remove existing data' do
+  command "rm -rf /var/opt/opscode /etc/opscode"
   creates '/etc/opscode/restore.json'
 end
 
-execute 'restore bookshelf data' do
-  command "tar xzf #{data} -C /var/opt/opscode/bookshelf/"
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'update local superuser cert' do
-  command lazy{
-    pivotal_cert = File.read('/etc/opscode/pivotal.cert')
-    "/opt/opscode/embedded/bin/psql -d opscode_chef -c \"update users set public_key=E'#{pivotal_cert}' where username='pivotal'\""
-  }
-  user 'opscode-pgsql'
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore chef server bookshelf start' do
-  command 'chef-server-ctl start bookshelf'
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore chef server start' do
-  command 'chef-server-ctl start erchef'
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore chef server wait for erchef' do
-  command 'sleep 10'
-  creates '/etc/opscode/restore.json'
-end
-
-execute 'restore chef server reindex' do
-  command 'chef-server-ctl reindex'
+execute 'restore tarball data' do
+  command "tar xzf #{data} -C /"
   creates '/etc/opscode/restore.json'
 end
 
 execute 'restore chef server restart' do
   command 'chef-server-ctl restart'
+  creates '/etc/opscode/restore.json'
+end
+
+execute 'restore chef server wait for opscode-erchef' do
+  command 'sleep 30'
+  creates '/etc/opscode/restore.json'
+end
+
+execute 'restore chef server reindex' do
+  command "for org in $(chef-server-ctl org-list) ; do chef-server-ctl reindex $org ; done"
   creates '/etc/opscode/restore.json'
 end
 
