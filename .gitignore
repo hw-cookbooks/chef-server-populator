@@ -2,6 +2,6 @@
 .kitchen.local.yml
 .librarian/
 tmp/
-cookbooks
+./cookbooks
 Gemfile.lock
 Cheffile.lock
