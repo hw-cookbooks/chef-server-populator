@@ -76,10 +76,11 @@ if(node[:chef_server_populator][:databag])
               notifies :reconfigure, 'chef_server_ingredient[chef-server-core]', :immediately
             end
           end
+          if(pub_key)
           execute 'add org validator key' do
             command "chef-server-ctl add-client-key #{client} #{client}-validator #{key_file} --key-name populator"
-            only_if { pub_key }
-            not_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep '^name: populator$'"
+            not_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep 'name: populator$'"
+            end
           end
           execute 'remove org default validator key' do
             command "chef-server-ctl delete-client-key #{client} #{client}-validator default"
