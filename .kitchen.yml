@@ -51,7 +51,7 @@ suites:
       - recipe[chef-server-populator]
     attributes:
       chef-server:
-        version: 12.0.5-1
+        version: 12.0.7-1
       chef_server_populator:
         endpoint: localhost
         databag: chef
