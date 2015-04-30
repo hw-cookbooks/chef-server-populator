@@ -1,3 +1,7 @@
+## v.1.0.4
+* Fixed missing user keys in test suite
+* Moved common org/user/client creation specs to the spec helper
+
 ## v1.0.2
 * Org recipe only included for solo run, since client run expects data
 bag items.
