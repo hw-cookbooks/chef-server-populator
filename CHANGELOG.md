@@ -1,6 +1,8 @@
-## v.1.0.4
+## Unreleased
 * Fixed missing user keys in test suite
 * Moved common org/user/client creation specs to the spec helper
+* Refactored Backup/Restore to work with Chef 12. Use Miasma rather
+than Fog.
 
 ## v1.0.2
 * Org recipe only included for solo run, since client run expects data
