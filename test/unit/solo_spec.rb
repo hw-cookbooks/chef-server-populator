@@ -170,6 +170,7 @@ describe 'chef-server-populator::solo' do
         test_org_user[:name] => "-----BEGIN PUBLIC KEY-----\n-----END PUBLIC KEY-----\n"
       }
 
+      stub_command("#{list_client_keys_cmd} | grep '^key_name: default$'").and_return(false)
       chef_run.converge(described_recipe)
     end
 
@@ -179,15 +180,18 @@ describe 'chef-server-populator::solo' do
 
     context 'when the client has a default key on the server' do
 
-      it 'removes the client\'s default public key' do
+      before do
         stub_command("#{list_client_keys_cmd} | grep '^key_name: default$'").and_return(true)
+        chef_run.converge(described_recipe)
+      end
+
+      it 'removes the client\'s default public key' do
         expect(chef_run).to run_execute("remove default public key for #{test_org_user[:name]}")
       end
 
     end
 
     it 'sets the client\'s public key' do
-      stub_command("#{list_client_keys_cmd} | grep '^key_name: default$'").and_return(false)
       expect(chef_run).to run_execute("set public key for: #{test_org_user[:name]}")
     end
   end
