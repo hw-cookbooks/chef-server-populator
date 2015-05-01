@@ -7,7 +7,7 @@ end
 include_recipe 'chef-server-populator::org'
 
 knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
-knife_opts = "-s https://127.0.0.1/#{node[:chef_server_populator][:populator_org]} -c /etc/opscode/pivotal.rb"
+knife_opts = "-s https://127.0.0.1/#{node[:chef_server_populator][:server_org]} -c /etc/opscode/pivotal.rb"
 
 node[:chef_server_populator][:clients].each do |client, pub_key|
   execute "create client: #{client}" do
