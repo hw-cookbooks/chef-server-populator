@@ -12,21 +12,102 @@ pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
 
 if(node[:chef_server_populator][:databag])
   begin
-    data_bag(node[:chef_server_populator][:databag]).each do |item_id|
-      item = data_bag_item(node[:chef_server_populator][:databag], item_id)
-      next unless item['chef_server']
-      client = item['id']
-      pub_key = item['chef_server']['client_key']
-      enabled = item['chef_server']['enabled']
-      types = [item['chef_server'].fetch('type', 'client')].flatten
-      admin = item['chef_server'].fetch('admin', true)
-      password = item['chef_server'].fetch('password', SecureRandom.urlsafe_base64(23))
-      full_name = item.fetch('full_name', client.capitalize)
-      first_name = full_name.split(' ').first
-      last_name = full_name.split(' ').last
-      email = item.fetch('email', "#{client}@example.com")
-      orgs = item['chef_server'].fetch('orgs', {})
-      org, options = orgs.first
+    items = data_bag(node[:chef_server_populator][:databag]).map do |bag_item|
+      item = data_bag_item(node[:chef_server_populator][:databag], bag_item)['chef_server']
+      item.merge('client' => data_bag_item(node[:chef_server_populator][:databag], bag_item)['id'],
+                 'pub_key' => item['client_key'],
+                 'enabled' => item['enabled'],
+                 'admin' => item.fetch('admin', true),
+                 'password' => item.fetch('password', SecureRandom.urlsafe_base64(23)),
+                 'orgs' => item.fetch('orgs', {}))
+    end
+    orgs = items.select { |item| item['type'].include?('org') }
+    users = items.select { |item| item['type'].include?('user') }
+    clients = items.select { |item| item['type'].include?('client') }
+
+    # Org Setup
+    orgs.each do |item|
+      item['full_name'] = item.fetch('full_name', item['client'].capitalize)
+      execute 'create org' do
+        item.merge('full_name' => item.fetch('full_name', item['client'].capitalize))
+        command "chef-server-ctl org-create #{item['client']} #{item['full_name']}"
+        not_if "chef-server-ctl org-list | grep '^#{item['client']}$'"
+        if item['client'] == node[:chef_server_populator][:default_org]
+          notifies :reconfigure, 'chef_server_ingredient[chef-server-core]', :immediately
+        end
+      end
+      if(item['pub_key'])
+        key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
+        file key_file do
+          backup false
+          content item['pub_key']
+          mode '0400'
+        end
+      end
+      execute 'add org validator key' do
+        command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator #{key_file} --key-name populator"
+        not_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: populator$'"
+      end
+      execute 'remove org default validator key' do
+        command "chef-server-ctl delete-client-key #{item['client']} #{item['client']}-validator default"
+        only_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: default$'"
+      end
+    end
+
+    # User Setup
+    users.each do |item|
+      org, options = item['orgs'].first
+      if(options)
+        if(options.has_key?('enabled'))
+          item[:enabled] = options[:enabled]
+        end
+        if(options.has_key?('admin'))
+          item[:admin] = options[:admin]
+        end
+      end
+      if(item['enabled'] == false)
+        execute "remove user: #{item['client']} from #{item['org']}" do
+          command "chef-server-ctl org-user-remove #{item['org']} #{item['client']}"
+        end
+        execute "delete user: #{item['client']}" do
+          command "chef-server-ctl user-delete #{item['client']}"
+          only_if "chef-server-list user-list | tr -d ' ' | grep '^#{item['client']}$'"
+        end
+      else
+        if(item['pub_key'])
+          key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
+          file key_file do
+            backup false
+            content item['pub_key']
+            mode '0400'
+          end
+        end
+        first_name = item['client'].split(' ').first.capitalize
+        last_name = item['client'].split(' ').last.capitalize
+        email = item.fetch('email', "#{item['client']}@example.com")
+        execute "create user: #{item['client']}" do
+          command "chef-server-ctl user-create #{item['client']} #{first_name} #{last_name} #{email} #{item['password']} > /dev/null 2>&1"
+          not_if "chef-server-ctl user-list | grep '^#{item['client']}$'"
+        end
+        if(item['pub_key'])
+          execute "set user key: #{item['client']}" do
+            command "chef-server-ctl add-user-key #{item['client']} #{key_file} --key-name populator"
+            not_if "chef-server-ctl list-user-keys #{item['client']} | grep 'name: populator$'"
+          end
+          execute "delete default user key: #{item['client']}" do
+            command "chef-server-ctl delete-user-key #{item['client']} default"
+            only_if "chef-server-ctl list-user-keys #{item['client']} | grep 'name: default$'"
+          end
+        end
+        execute "set user org: #{item['client']}" do
+          command "chef-server-ctl org-user-add #{item['org']} #{item['client']} #{'--admin' if item['admin']}"
+          only_if { item['org'] }
+        end
+      end
+    end
+    # Client Setup
+    clients.each do |item|
+      org, options = item['orgs'].first
       if(org)
         knife_url = "-s https://127.0.0.1/organizations/#{org}"
       else
@@ -34,96 +115,40 @@ if(node[:chef_server_populator][:databag])
       end
       if(options)
         if(options.has_key?('enabled'))
-          enabled = options[:enabled]
+          item[:enabled] = options[:enabled]
         end
         if(options.has_key?('admin'))
-          admin = options[:admin]
+          item[:admin] = options[:admin]
         end
       end
       if(item['enabled'] == false)
-        if(types.include?('client'))
-          execute "delete client: #{client}" do
-            command "#{knife_cmd} client delete #{client} -d #{knife_opts} #{knife_url}"
-            only_if "#{knife_cmd} client list #{knife_opts} #{knife_url} | tr -d ' ' | grep '^#{client}$'"
-            retries 10
-          end
-        end
-        if(types.include?('user'))
-          execute "remove user: #{client} from #{org}" do
-            command "chef-server-ctl org-user-remove #{org} #{client}"
-          end
-          execute "delete user: #{client}" do
-            command "chef-server-ctl user-delete #{client}"
-            only_if "chef-server-list user-list | tr -d ' ' | grep '^#{client}$'"
-          end
+        execute "delete client: #{item['client']}" do
+          command "#{knife_cmd} client delete #{item['client']} -d #{knife_opts} #{knife_url}"
+          only_if "#{knife_cmd} client list #{knife_opts} #{knife_url} | tr -d ' ' | grep '^#{item['client']}$'"
+          retries 10
         end
       else
-
-        if(pub_key)
-          key_file = "#{Chef::Config[:file_cache_path]}/#{client}.pub"
+        if(item['pub_key'])
+          key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
           file key_file do
             backup false
-            content pub_key
+            content item['pub_key']
             mode '0400'
           end
         end
-
-        if(types.include?('org'))
-          execute 'create org' do
-            command "chef-server-ctl org-create #{client} #{full_name}"
-            not_if "chef-server-ctl org-list | grep '^#{client}$'"
-            if client == node[:chef_server_populator][:default_org]
-              notifies :reconfigure, 'chef_server_ingredient[chef-server-core]', :immediately
-            end
-          end
-          if(pub_key)
-          execute 'add org validator key' do
-            command "chef-server-ctl add-client-key #{client} #{client}-validator #{key_file} --key-name populator"
-            not_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep 'name: populator$'"
-            end
-          end
-          execute 'remove org default validator key' do
-            command "chef-server-ctl delete-client-key #{client} #{client}-validator default"
-            only_if "chef-server-ctl list-client-keys #{client} #{client}-validator | grep 'name: default$'"
-          end
+        execute "create client: #{item['client']}" do
+          command "#{knife_cmd} client create #{item['client']}#{' --admin' if item['admin']} -d #{knife_url} #{knife_opts}"
+          not_if "#{knife_cmd} client list #{knife_url} #{knife_opts} | tr -d ' ' | grep '^#{item['client']}$'"
+          retries 10
         end
-
-        if(types.include?('client'))
-          execute "create client: #{client}" do
-            command "#{knife_cmd} client create #{client}#{' --admin' if admin} -d #{knife_url} #{knife_opts}"
-            not_if "#{knife_cmd} client list #{knife_url} #{knife_opts} | tr -d ' ' | grep '^#{client}$'"
-            retries 10
+        if(item['pub_key'])
+          execute "set client key: #{item['client']}" do
+            command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} #{key_file} --key-name populator"
+            not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{item['client']} | grep 'name: populator$'"
           end
-          if(pub_key)
-            execute "set client key: #{client}" do
-              command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{client} #{key_file} --key-name populator"
-              not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{client} | grep 'name: populator$'"
-            end
-            execute "delete default client key: #{client}" do
-              command "chef-server-ctl delete-client-key #{org || node[:chef_server_populator][:default_org]} #{client} default"
-              only_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{client} | grep 'name: default$'"
-            end
-          end
-        end
-
-        if(types.include?('user'))
-          execute "create user: #{client}" do
-            command "chef-server-ctl user-create #{client} #{first_name} #{last_name} #{email} #{password} > /dev/null 2>&1"
-            not_if "chef-server-ctl user-list | grep '^#{client}$'"
-          end
-          if(pub_key)
-            execute "set user key: #{client}" do
-              command "chef-server-ctl add-user-key #{client} #{key_file} --key-name populator"
-              not_if "chef-server-ctl list-user-keys #{client} | grep 'name: populator$'"
-            end
-            execute "delete default user key: #{client}" do
-              command "chef-server-ctl delete-user-key #{client} default"
-              only_if "chef-server-ctl list-user-keys #{client} | grep 'name: default$'"
-            end
-          end
-          execute "set user org: #{client}" do
-            command "chef-server-ctl org-user-add #{org} #{client} #{'--admin' if admin}"
-            only_if { org }
+          execute "delete default client key: #{item['client']}" do
+            command "chef-server-ctl delete-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} default"
+            only_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{item['client']} | grep 'name: default$'"
           end
         end
       end
