@@ -3,5 +3,5 @@ source "https://rubygems.org"
 
 gem "chef"
 gem "librarian-chef"
-gem "test-kitchen"
-gem "kitchen-vagrant"
+gem "test-kitchen", '~> 1.3.0'
+gem "kitchen-vagrant", '~> 0.16.0'
