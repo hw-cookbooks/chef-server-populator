@@ -19,11 +19,11 @@ node[:chef_server_populator][:clients].each do |client, pub_key|
     pub_key_path = File.join(node[:chef_server_populator][:base_path], pub_key)
     execute "remove default public key for #{client}" do
       command "chef-server-ctl delete-client-key #{node[:chef_server_populator][:server_org]} #{client} default"
-      only_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #{client} | grep '^key_name: default$'"
+      only_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #{client} | grep 'name: default$'"
     end
     execute "set public key for: #{client}" do
       command "chef-server-ctl add-client-key #{node[:chef_server_populator][:server_org]} #{client} #{pub_key_path} --key-name populator"
-      not_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #{client} | grep '^key_name: populator$'"
+      not_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #{client} | grep 'name: populator$'"
     end
   end
 end
