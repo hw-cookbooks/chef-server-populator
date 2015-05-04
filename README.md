@@ -103,7 +103,7 @@ creating the org.
 * Include chef-server-populator::restore recipe
 * Set backup cron interval with node[:chef_server_populator][:schedule]
 * Optionally set a remote storage location with node[:chef_server_populator][:backup][:remote][:connection]
-* Backups include both a pg_dump of the entire chef database and a tarball of the bookshelf data directory
+* Backups include both a pg_dump of the entire chef database and a tarball of the Chef data directory
 
 ## Public Key Format
 
@@ -144,10 +144,6 @@ If the hash is non-empty, it will write the chef-server `dna.json` and trigger a
 * As mentioned above, user and client data bag items currently only
   support the first organization provided. Multi-org support is
   forthcoming.
-* Backup and Restore for Chef 12 are not fully tested. The relevant
-  commands have been updated, and as these are full database actions,
-  they are expected to still work. We will be verifying these in the
-  near future.
 
 ## Examples
 
