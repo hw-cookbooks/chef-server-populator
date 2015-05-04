@@ -11,15 +11,15 @@ platforms:
   - name: ubuntu-14.04
     attributes:
       chef-server:
-        version: 12.0.5-1
+        version: 12.0.7-1
   - name: ubuntu-12.04
     attributes:
       chef-server:
-        version: 12.0.5-1
+        version: 12.0.7-1
   - name: centos-6.6
     attributes:
       chef-server:
-        version: 12.0.5-1.el6
+        version: 12.0.7-1.el6
   - name: centos-6.4
     driver:
       box: opscode-centos-6.4
@@ -42,3 +42,14 @@ suites:
           pub_key: user_pub.pem
         clients:
           test-node: client_key_pub.pem
+  - name: data-bag
+    provisioner:
+      name: chef_zero
+    data_bags_path: test/fixtures/data_bags
+    run_list:
+      - recipe[test]
+      - recipe[chef-server-populator]
+    attributes:
+      chef_server_populator:
+        endpoint: localhost
+        databag: chef
