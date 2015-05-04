@@ -1,4 +1,4 @@
-## Unreleased
+## v1.1.0
 * Fixes and loosens idempotency tests to account for Chef Server
 version differences
 * Updates Client recipe to create orgs, then users, then clients
