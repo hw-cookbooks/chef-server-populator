@@ -1,7 +1,11 @@
 ## Unreleased
-* Fixed missing user keys in test suite
-* Moved common org/user/client creation specs to the spec helper
-* Refactored Backup/Restore to work with Chef 12. Use Miasma rather
+* Fixes and loosens idempotency tests to account for Chef Server
+version differences
+* Updates Client recipe to create orgs, then users, then clients
+* Fixes non-existent org attribute in solo recipe
+* Fixes missing user keys in test suite
+* Moves common org/user/client creation specs to the spec helper
+* Refactors Backup/Restore to work with Chef 12. Uses Miasma rather
 than Fog.
 
 ## v1.0.2
