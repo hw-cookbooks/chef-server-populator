@@ -89,6 +89,7 @@ if(node[:chef_server_populator][:databag])
             mode '0400'
           end
         end
+        item['full_name'] = item.fetch('full_name', item['client'].capitalize)
         first_name = item['full_name'].split(' ').first.capitalize
         last_name = item['full_name'].split(' ').last.capitalize
         email = item.fetch('email', "#{item['client']}@example.com")
