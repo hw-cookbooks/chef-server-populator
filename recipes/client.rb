@@ -28,7 +28,7 @@ if(node[:chef_server_populator][:databag])
     # Org Setup
     orgs.each do |item|
       item['full_name'] = item.fetch('full_name', item['client'].capitalize)
-      execute 'create org' do
+      execute "create org: #{item['client']}" do
         item.merge('full_name' => item.fetch('full_name', item['client'].capitalize))
         command "chef-server-ctl org-create #{item['client']} #{item['full_name']}"
         not_if "chef-server-ctl org-list | grep '^#{item['client']}$'"
@@ -44,11 +44,11 @@ if(node[:chef_server_populator][:databag])
           mode '0400'
         end
       end
-      execute 'add org validator key' do
+      execute "add org validator key: #{item['client']}" do
         command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator #{key_file} --key-name populator"
         not_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: populator$'"
       end
-      execute 'remove org default validator key' do
+      execute "remove org default validator key: #{item['client']}" do
         command "chef-server-ctl delete-client-key #{item['client']} #{item['client']}-validator default"
         only_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: default$'"
       end
@@ -82,8 +82,8 @@ if(node[:chef_server_populator][:databag])
             mode '0400'
           end
         end
-        first_name = item['client'].split(' ').first.capitalize
-        last_name = item['client'].split(' ').last.capitalize
+        first_name = item['full_name'].split(' ').first.capitalize
+        last_name = item['full_name'].split(' ').last.capitalize
         email = item.fetch('email', "#{item['client']}@example.com")
         execute "create user: #{item['client']}" do
           command "chef-server-ctl user-create #{item['client']} #{first_name} #{last_name} #{email} #{item['password']} > /dev/null 2>&1"
