@@ -27,33 +27,36 @@ if(node[:chef_server_populator][:databag])
 
     # Org Setup
     orgs.each do |item|
-      item['full_name'] = item.fetch('full_name', item['client'].capitalize)
-      execute "create org: #{item['client']}" do
-        item.merge('full_name' => item.fetch('full_name', item['client'].capitalize))
-        command "chef-server-ctl org-create #{item['client']} #{item['full_name']}"
-        not_if "chef-server-ctl org-list | grep '^#{item['client']}$'"
-        if item['client'] == node[:chef_server_populator][:default_org]
-          notifies :reconfigure, 'chef_server_ingredient[chef-server-core]', :immediately
+      if(item['enabled']==true)
+        item['full_name'] = item.fetch('full_name', item['client'].capitalize)
+        execute "create org: #{item['client']}" do
+          item.merge('full_name' => item.fetch('full_name', item['client'].capitalize))
+          command "chef-server-ctl org-create #{item['client']} #{item['full_name']}"
+          not_if "chef-server-ctl org-list | grep '^#{item['client']}$'"
+          if item['client'] == node[:chef_server_populator][:default_org]
+            notifies :reconfigure, 'chef_server_ingredient[chef-server-core]', :immediately
+          end
         end
-      end
-      if(item['pub_key'])
-        key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
-        file key_file do
-          backup false
-          content item['pub_key']
-          mode '0400'
+        if(item['pub_key'])
+          key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
+          file key_file do
+            backup false
+            content item['pub_key']
+            mode '0400'
+          end
         end
-      end
-      execute "add org validator key: #{item['client']}" do
-        command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator #{key_file} --key-name populator"
-        not_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: populator$'"
-      end
-      execute "remove org default validator key: #{item['client']}" do
-        command "chef-server-ctl delete-client-key #{item['client']} #{item['client']}-validator default"
-        only_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: default$'"
+        execute "add org validator key: #{item['client']}" do
+          command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator #{key_file} --key-name populator"
+          not_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: populator$'"
+        end
+        execute "remove org default validator key: #{item['client']}" do
+          command "chef-server-ctl delete-client-key #{item['client']} #{item['client']}-validator default"
+          only_if "chef-server-ctl list-client-keys #{item['client']} #{item['client']}-validator | grep 'name: default$'"
+        end
+      else
+        Chef::Log.info("#{item['client']} is not enabled, skipping.")
       end
     end
-
     # User Setup
     users.each do |item|
       org, options = item['orgs'].first
