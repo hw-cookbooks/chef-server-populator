@@ -57,6 +57,7 @@ if(node[:chef_server_populator][:databag])
     # User Setup
     users.each do |item|
       org, options = item['orgs'].first
+      item['org'] = org
       if(options)
         if(options.has_key?('enabled'))
           item[:enabled] = options[:enabled]
@@ -101,7 +102,6 @@ if(node[:chef_server_populator][:databag])
         end
         execute "set user org: #{item['client']}" do
           command "chef-server-ctl org-user-add #{item['org']} #{item['client']} #{'--admin' if item['admin']}"
-          only_if { item['org'] }
         end
       end
     end
