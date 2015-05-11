@@ -82,8 +82,8 @@ if(node[:chef_server_populator][:databag])
             mode '0400'
           end
         end
-        first_name = item['client'].split(' ').first.capitalize
-        last_name = item['client'].split(' ').last.capitalize
+        first_name = item['full_name'].split(' ').first.capitalize
+        last_name = item['full_name'].split(' ').last.capitalize
         email = item.fetch('email', "#{item['client']}@example.com")
         execute "create user: #{item['client']}" do
           command "chef-server-ctl user-create #{item['client']} #{first_name} #{last_name} #{email} #{item['password']} > /dev/null 2>&1"
