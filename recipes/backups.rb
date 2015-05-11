@@ -19,9 +19,9 @@ end
   end
 end
 
-node[:chef_server_populator][:backup_gems].keys.each do |gem_name, gem_version|
+node[:chef_server_populator][:backup_gems].each_pair do |gem_name, gem_version|
   gem_package gem_name do
-    if gem_version
+    if !gem_version.nil?
       version gem_version
     end
     only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
