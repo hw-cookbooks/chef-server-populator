@@ -1,3 +1,5 @@
+include_recipe 'chef-server'
+
 conf_dir = node[:chef_server_populator][:base_path]
 node.set['chef-server'][:configuration][:default_orgname] = node[:chef_server_populator][:default_org]
 
