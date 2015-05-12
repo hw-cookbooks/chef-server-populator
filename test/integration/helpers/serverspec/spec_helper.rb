@@ -20,12 +20,21 @@ describe 'chef-server-org-creation' do
     its(:stdout) { should match /inception_llc/ }
   end
 
+  describe command('chef-server-ctl list-client-keys inception_llc populator') do
+    its(:stdout) { should match /populator/ }
+  end
+
+end
+
+describe 'chef-server-user-creation' do
+
   describe command('chef-server-ctl user-list') do
     its(:stdout) { should match /pivotal\npopulator/ }
   end
 
-  describe command('chef-server-ctl list-client-keys inception_llc populator') do
-    its(:stdout) { should match /populator/ }
+
+  describe command('sudo chef-server-ctl org-user-add inception_llc populator') do
+    its(:stdout) { should match /User populator already associated with organization inception_llc/ }
   end
 
 end

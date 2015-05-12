@@ -1,3 +1,8 @@
+## Unrealeased
+
+* Fixes issue #23 where users were not assigned to orgs.
+* Fixes issue #22 where client recipe failed if no chef_server hash set.
+
 ## v1.1.0
 * Fixes and loosens idempotency tests to account for Chef Server
 version differences
