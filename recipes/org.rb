@@ -1,3 +1,5 @@
+include_recipe 'chef-server'
+
 conf_dir = node[:chef_server_populator][:base_path]
 node.set['chef-server'][:configuration][:default_orgname] = node[:chef_server_populator][:default_org]
 
@@ -12,12 +14,12 @@ end
 
 execute 'set populator user key' do
   command "chef-server-ctl add-user-key #{user[:name]} #{conf_dir}/#{user[:pub_key]} --key-name populator"
-  not_if "chef-server-ctl list-user-keys #{user[:name]} | grep '^key_name: populator$'"
+  not_if "chef-server-ctl list-user-keys #{user[:name]} | grep 'name: populator$'"
 end
 
 execute 'delete default user key' do
   command "chef-server-ctl delete-user-key #{user[:name]} default"
-  only_if "chef-server-ctl list-user-keys #{user[:name]} | grep '^key_name: default$'"
+  only_if "chef-server-ctl list-user-keys #{user[:name]} | grep 'name: default$'"
 end
 
 execute 'create populator org' do
@@ -30,10 +32,10 @@ end
 
 execute 'add populator org validator key' do
   command "chef-server-ctl add-client-key #{org[:org_name]} #{org[:org_name]}-validator #{conf_dir}/#{org[:validator_pub_key]} --key-name populator"
-  not_if "chef-server-ctl list-client-keys #{org[:org_name]} #{org[:org_name]}-validator | grep '^key_name: populator$'"
+  not_if "chef-server-ctl list-client-keys #{org[:org_name]} #{org[:org_name]}-validator | grep 'name: populator$'"
 end
 
 execute 'remove populator org default validator key' do
   command "chef-server-ctl delete-client-key #{org[:org_name]} #{org[:org_name]}-validator default"
-  only_if "chef-server-ctl list-client-keys #{org[:org_name]} #{org[:org_name]}-validator | grep '^key_name: default$'"
+  only_if "chef-server-ctl list-client-keys #{org[:org_name]} #{org[:org_name]}-validator | grep 'name: default$'"
 end
