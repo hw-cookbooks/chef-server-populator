@@ -1,5 +1,6 @@
 ## Unrealeased
 
+* Adds myriad unit tests.
 * Fixes issue #23 where users were not assigned to orgs.
 * Fixes issue #22 where client recipe failed if no chef_server hash set.
 
