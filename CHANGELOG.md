@@ -1,4 +1,4 @@
-## Unrealeased
+## v1.1.2
 
 * Adds myriad unit tests.
 * Fixes issue #23 where users were not assigned to orgs.
