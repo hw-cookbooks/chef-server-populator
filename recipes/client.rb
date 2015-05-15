@@ -66,10 +66,10 @@ if(node[:chef_server_populator][:databag])
       item['org'] = org
       if(options)
         if(options.has_key?('enabled'))
-          item[:enabled] = options[:enabled]
+          item['enabled'] = options['enabled']
         end
         if(options.has_key?('admin'))
-          item[:admin] = options[:admin]
+          item['admin'] = options['admin']
         end
       end
       if(item['enabled'] == false)
