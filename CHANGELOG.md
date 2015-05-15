@@ -1,5 +1,9 @@
-## v1.1.2
+## Unreleased
+* Fixes all users created as admins
+* Updates user creation to require explicit enabled setting
+* Updates client admin to default to false
 
+## v1.1.2
 * Adds myriad unit tests.
 * Fixes issue #23 where users were not assigned to orgs.
 * Fixes issue #22 where client recipe failed if no chef_server hash set.
