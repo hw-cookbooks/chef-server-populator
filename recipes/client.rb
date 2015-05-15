@@ -80,7 +80,7 @@ if(node[:chef_server_populator][:databag])
           command "chef-server-ctl user-delete #{item['client']}"
           only_if "chef-server-list user-list | tr -d ' ' | grep '^#{item['client']}$'"
         end
-      else
+      elsif(item['enabled'] == true)
         if(item['pub_key'])
           key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
           file key_file do
