@@ -20,7 +20,7 @@ if(node[:chef_server_populator][:databag])
       item.merge('client' => data_bag_item(node[:chef_server_populator][:databag], bag_item)['id'],
                  'pub_key' => item['client_key'],
                  'enabled' => item['enabled'],
-                 'admin' => item.fetch('admin', true),
+                 'admin' => item.fetch('admin', false),
                  'password' => item.fetch('password', SecureRandom.urlsafe_base64(23)),
                  'orgs' => item.fetch('orgs', {}))
     end
