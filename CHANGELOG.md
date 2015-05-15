@@ -1,4 +1,4 @@
-## Unreleased
+## v.1.1.4
 * Fixes all users created as admins
 * Updates user creation to require explicit enabled setting
 * Updates client admin to default to false
