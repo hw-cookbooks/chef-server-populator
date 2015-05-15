@@ -20,7 +20,7 @@ if(node[:chef_server_populator][:databag])
       item.merge('client' => data_bag_item(node[:chef_server_populator][:databag], bag_item)['id'],
                  'pub_key' => item['client_key'],
                  'enabled' => item['enabled'],
-                 'admin' => item.fetch('admin', true),
+                 'admin' => item.fetch('admin', false),
                  'password' => item.fetch('password', SecureRandom.urlsafe_base64(23)),
                  'orgs' => item.fetch('orgs', {}))
     end
@@ -66,10 +66,10 @@ if(node[:chef_server_populator][:databag])
       item['org'] = org
       if(options)
         if(options.has_key?('enabled'))
-          item[:enabled] = options[:enabled]
+          item['enabled'] = options['enabled']
         end
         if(options.has_key?('admin'))
-          item[:admin] = options[:admin]
+          item['admin'] = options['admin']
         end
       end
       if(item['enabled'] == false)
@@ -80,7 +80,7 @@ if(node[:chef_server_populator][:databag])
           command "chef-server-ctl user-delete #{item['client']}"
           only_if "chef-server-list user-list | tr -d ' ' | grep '^#{item['client']}$'"
         end
-      else
+      elsif(item['enabled'] == true)
         if(item['pub_key'])
           key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
           file key_file do
