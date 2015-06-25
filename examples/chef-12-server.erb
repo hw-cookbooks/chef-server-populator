@@ -1,7 +1,7 @@
 ##### Example bootstrap template #####
-# This bootstrap will create a brand new erchef server and
-# use your existing settings to set things up. It will automatically
-# disable the webui, create a client named after the client in
+# This bootstrap will create a brand new chef 12 server and
+# use your existing settings to set things up. It will create
+# a client named after the client in
 # your existing configuration, and update the public keys for your
 # client, as well as the chef-validator. Afterwards, it will install
 # the cookbooks it requires for itself, and then register itself with
@@ -38,7 +38,7 @@ EOP
 ) > /tmp/chef-server-setup/user_pub.pem
 
 mkdir -p /etc/chef
-cp /tmp/chef-server-setup/validation.pem /etc/chef/validation.pem
+cp /tmp/chef-server-setup/validator.pem /etc/chef/validator.pem
 chmod 600 /etc/chef/validator.pem
 
 IPADDR=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
