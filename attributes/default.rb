@@ -29,6 +29,7 @@ default[:chef_server_populator][:backup][:dir] = '/tmp/chef-server/backup'
 default[:chef_server_populator][:backup][:filename] = 'chef-server-full'
 default[:chef_server_populator][:backup][:remote][:connection] = {}
 default[:chef_server_populator][:backup][:remote][:directory] = nil
+default[:chef_server_populator][:backup][:remote][:file_prefix] = nil
 default[:chef_server_populator][:backup][:schedule] = {
   :minute => '33',
   :hour => '3'
@@ -54,4 +55,4 @@ default[:chef_server_populator][:solo_org_user] = {
 
 default[:chef_server_populator][:server_org] = 'inception_llc'
 #If this is set to nil, the configurator recipe will set it to the server_org.
-default[:chef_server_populator][:default_org] = nil 
+default[:chef_server_populator][:default_org] = nil

@@ -75,6 +75,10 @@ remote_directory = [:remote, :directory].inject(config) do |memo, key|
   memo[key] || break
 end
 
+remote_prefix = [:remote, :prefix].inject(config) do |memo, key|
+  memo[key] || break
+end
+
 if(remote_creds)
   if(remote_directory)
     remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds)
@@ -82,7 +86,11 @@ if(remote_creds)
     [db_file, data_file].each do |file|
       [ :date_stamped, :latest ].each do |type|
         remote_file = Miasma::Models::Storage::File.new(directory)
-        remote_file.name = type == :date_stamped ? File.basename(file) : "latest#{File.extname(file)}"
+        remote_file.name = File.join(*[
+            remote_prefix,
+            type == :date_stamped ? File.basename(file) : "latest#{File.extname(file)}"
+          ].flatten.compact
+        )
         remote_file.body = File.open(file, 'r')
         remote_file.save
       end
