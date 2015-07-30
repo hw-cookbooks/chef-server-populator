@@ -81,7 +81,7 @@ end
 
 if(remote_creds)
   if(remote_directory)
-    remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds)
+    remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds[:credentials])
     directory = remote.buckets.get(remote_directory)
     [db_file, data_file].each do |file|
       [ :date_stamped, :latest ].each do |type|
