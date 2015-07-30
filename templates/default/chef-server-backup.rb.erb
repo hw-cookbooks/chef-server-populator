@@ -25,7 +25,7 @@ server_manifest = MultiJson.load(
 
 prefix = [
   Time.now.to_i,
-  "ver_#{server_manifest[:version]}",
+  "ver_#{server_manifest[:build_version]}",
   config[:filename]
 ].join('-')
 
