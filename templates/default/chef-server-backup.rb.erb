@@ -75,7 +75,7 @@ remote_directory = [:remote, :directory].inject(config) do |memo, key|
   memo[key] || break
 end
 
-remote_prefix = [:remote, :prefix].inject(config) do |memo, key|
+remote_prefix = [:remote, :file_prefix].inject(config) do |memo, key|
   memo[key] || break
 end
 
