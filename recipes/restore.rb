@@ -47,7 +47,7 @@ execute 'shutdown postgresql after restore' do
 end
 
 execute 'wait for postgresql to stop' do
-  command 'sleep 180'
+  command 'sleep 20'
   creates '/etc/opscode/restore.json'
 end
 
