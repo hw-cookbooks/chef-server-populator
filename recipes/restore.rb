@@ -24,9 +24,17 @@ execute 'backup chef server stop' do
   creates '/etc/opscode/restore.json'
 end
 
+ruby_block 'sleep10s' do
+  block do
+    sleep 10
+  end
+  action :nothing
+end
+
 execute 'restore chef server start postgres' do
   command 'chef-server-ctl start postgresql'
   creates '/etc/opscode/restore.json'
+  notifies :run, 'ruby_block[sleep10s]', :immediately
 end
 
 #Drop and Restore entire chef database from file
