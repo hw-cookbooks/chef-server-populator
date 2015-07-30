@@ -42,7 +42,7 @@ execute 'restoring chef data' do
 end
 
 execute 'restore chef server wait for postgresql post restore' do
-  command 'sleep 10'
+  command 'sleep 30'
   creates '/etc/opscode/restore.json'
 end
 
