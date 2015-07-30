@@ -14,7 +14,7 @@ if(node[:chef_server_populator][:backup][:remote][:connection])
   remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds[:credentials])
   remote_bucket = remote.buckets.get(remote_directory)
   if(remote_bucket && gz_file = remote_bucket.files.get(File.join(node[:chef_server_populator][:backup][:remote][:file_prefix], 'latest.tgz')))
-    dump_file = remote_bucket.get(remote_bucket.files.get(File.join(node[:chef_server_populator][:backup][:remote][:file_prefix], 'latest.dump')))
+    dump_file = remote_bucket.files.get(File.join(node[:chef_server_populator][:backup][:remote][:file_prefix], 'latest.dump'))
     local_gz = '/tmp/latest.tgz'
     local_dump = '/tmp/latest.dump'
     File.open(local_gz, 'wb') do |file|
