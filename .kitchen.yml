@@ -56,6 +56,7 @@ suites:
   - name: backups
     run_list:
       - recipe[test]
+      - recipe[apt]
       - recipe[build-essential]
       - recipe[chef-server-populator]
       - recipe[chef-server-populator::backups]
@@ -68,3 +69,7 @@ suites:
           pub_key: user_pub.pem
         clients:
           test-node: client_key_pub.pem
+        backup:
+          remote:
+            connection: false
+            directory: false

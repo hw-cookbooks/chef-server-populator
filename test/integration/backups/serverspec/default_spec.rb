@@ -19,7 +19,7 @@ describe 'backups-configured' do
 end
 
 describe 'creates-backups' do
-  describe command('/usr/local/bin/chef-server-backup') do
+  describe command('PATH=/opt/chef/embedded/bin:$PATH /usr/local/bin/chef-server-backup') do
     its(:exit_status) { should eq 0 }
   end
 end
