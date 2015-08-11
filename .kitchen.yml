@@ -9,10 +9,14 @@ provisioner:
 
 platforms:
   - name: ubuntu-14.04
+    run_list:
+      - recipe[apt]
     attributes:
       chef-server:
         version: 12.0.7-1
   - name: ubuntu-12.04
+    run_list:
+      - recipe[apt]
     attributes:
       chef-server:
         version: 12.0.7-1
@@ -56,7 +60,6 @@ suites:
   - name: backups
     run_list:
       - recipe[test]
-      - recipe[apt]
       - recipe[build-essential]
       - recipe[chef-server-populator]
       - recipe[chef-server-populator::backups]
