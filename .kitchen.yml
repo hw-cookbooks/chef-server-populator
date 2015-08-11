@@ -53,3 +53,18 @@ suites:
       chef_server_populator:
         endpoint: localhost
         databag: chef
+  - name: backups
+    run_list:
+      - recipe[test]
+      - recipe[build-essential]
+      - recipe[chef-server-populator]
+      - recipe[chef-server-populator::backups]
+    attributes:
+      chef_server_populator:
+        endpoint: localhost
+        solo_org:
+          validator_pub_key: validator_pub.pem
+        org_users:
+          pub_key: user_pub.pem
+        clients:
+          test-node: client_key_pub.pem
