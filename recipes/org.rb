@@ -31,7 +31,11 @@ execute 'create populator org' do
 end
 
 execute 'add populator org validator key' do
-  command "chef-server-ctl add-client-key #{org[:org_name]} #{org[:org_name]}-validator #{conf_dir}/#{org[:validator_pub_key]} --key-name populator"
+  if node['chef-server'][:version].to_f >= 12.1
+    command "chef-server-ctl add-client-key #{org[:org_name]} #{org[:org_name]}-validator --public-key-path #{conf_dir}/#{org[:validator_pub_key]} --key-name populator"
+  else
+    command "chef-server-ctl add-client-key #{org[:org_name]} #{org[:org_name]}-validator #{conf_dir}/#{org[:validator_pub_key]} --key-name populator"
+      end
   not_if "chef-server-ctl list-client-keys #{org[:org_name]} #{org[:org_name]}-validator | grep 'name: populator$'"
 end
 

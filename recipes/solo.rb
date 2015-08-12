@@ -56,7 +56,11 @@ else
         only_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #{client} | grep 'name: default$'"
       end
       execute "set public key for: #{client}" do
+      if node['chef-server'][:version].to_f >= 12.1
+        command "chef-server-ctl add-client-key #{node[:chef_server_populator][:server_org]} #{client} --public-key-path #{pub_key_path} --key-name populator"
+      else
         command "chef-server-ctl add-client-key #{node[:chef_server_populator][:server_org]} #{client} #{pub_key_path} --key-name populator"
+      end
         not_if "chef-server-ctl list-client-keys #{node[:chef_server_populator][:server_org]} #{client} | grep 'name: populator$'"
       end
     end

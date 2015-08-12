@@ -150,8 +150,12 @@ if(node[:chef_server_populator][:databag])
         end
         if(item['pub_key'])
           execute "set client key: #{item['client']}" do
-            command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} --public-key-path #{key_file} --key-name populator"
-            not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{item['client']} | grep 'name: populator$'"
+            if node['chef-server'][:version].to_f >= 12.1
+              command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} --public-key-path #{key_file} --key-name populator"
+            else
+              command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} #{key_file} --key-name populator"
+            end
+              not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{item['client']} | grep 'name: populator$'"
           end
           execute "delete default client key: #{item['client']}" do
             command "chef-server-ctl delete-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} default"
