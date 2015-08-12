@@ -29,10 +29,25 @@ execute 'restore chef server start postgres' do
   creates '/etc/opscode/restore.json'
 end
 
+execute 'restore chef server wait for postgresql' do
+  command 'sleep 10'
+  creates '/etc/opscode/restore.json'
+end
+
 #Drop and Restore entire chef database from file
 execute 'restoring chef data' do
   command "/opt/opscode/embedded/bin/psql -f #{file} postgres"
   user 'opscode-pgsql'
+  creates '/etc/opscode/restore.json'
+end
+
+execute 'shutdown postgresql after restore' do
+  command 'chef-server-ctl stop postgresql'
+  creates '/etc/opscode/restore.json'
+end
+
+execute 'wait for postgresql to stop' do
+  command 'sleep 20'
   creates '/etc/opscode/restore.json'
 end
 
