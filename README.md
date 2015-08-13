@@ -37,9 +37,9 @@ User:
 ```json
 {
   "id": "user_name",
-  "full_name": "User Name",
-  "email": "name@domain.tld",
   "chef_server": {
+    "full_name": "User Name",
+    "email": "name@domain.tld",
     "client_key": "public key contents",
     "type": [
       "user"
@@ -79,8 +79,8 @@ Org:
 ```json
 {
   "id": "org_name",
-  "full_name": "Organization Name",
   "chef_server": {
+    "full_name": "Organization Name",
     "client_key": "public key contents",
     "type": [
       "org"
@@ -91,6 +91,8 @@ Org:
 ```
 Note: Creating the org will create a client called `<org>-validator` which uses the public key specified when 
 creating the org.
+In addition, there is currently a bug in Chef server 12.1 which means only the first word in
+the full name will be used, as the option is not parsed correctly
 
 **Restoring from a backup:**
 
