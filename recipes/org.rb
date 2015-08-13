@@ -5,7 +5,7 @@ node.set['chef-server'][:configuration][:default_orgname] = node[:chef_server_po
 
 org = node[:chef_server_populator][:solo_org]
 user = node[:chef_server_populator][:solo_org_user]
-pass = user[:pass] || SecureRandom.base64
+pass = user[:pass] || SecureRandom.urlsafe_base64(23).gsub(/^\-*/,'')
 
 execute 'create populator user' do
   command "chef-server-ctl user-create #{user[:name]} #{user[:first]} #{user[:last]} #{user[:email]} #{pass}"

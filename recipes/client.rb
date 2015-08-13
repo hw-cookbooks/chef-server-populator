@@ -21,7 +21,7 @@ if(node[:chef_server_populator][:databag])
                  'pub_key' => item['client_key'],
                  'enabled' => item['enabled'],
                  'admin' => item.fetch('admin', false),
-                 'password' => item.fetch('password', SecureRandom.urlsafe_base64(23)),
+                 'password' => item.fetch('password', SecureRandom.urlsafe_base64(23).gsub(/^\-*/,'')),
                  'orgs' => item.fetch('orgs', {}))
     end
     orgs = items.select { |item| item.fetch('type', []).include?('org') }
