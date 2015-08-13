@@ -1,5 +1,13 @@
 ## Unreleased
 
+* Adds support for both 12.0.x and 12.1.x versions, client key
+  commands got a new flag which broke things.
+* Prevents randomly generated passwords from starting with a '-' which
+  will register as a flag and cause an error.
+* Fixes backup recipe when using remote backups
+* Fixes backup recipe when running as cron
+* Updates and extends the integration tests to cover backups
+
 ## v.1.1.4
 * Fixes all users created as admins
 * Updates user creation to require explicit enabled setting
