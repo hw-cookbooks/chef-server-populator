@@ -9,24 +9,28 @@ provisioner:
 
 platforms:
   - name: ubuntu-14.04
+    run_list:
+      - recipe[apt]
     attributes:
       chef-server:
-        version: 12.0.7-1
+        version: 12.1.2-1
   - name: ubuntu-12.04
+    run_list:
+      - recipe[apt]
     attributes:
       chef-server:
-        version: 12.0.7-1
+        version: 12.1.2-1
   - name: centos-6.6
     attributes:
       chef-server:
-        version: 12.0.7-1.el6
+        version: 12.1.2-1.el6
   - name: centos-6.4
     driver:
       box: opscode-centos-6.4
       box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.4_chef-provisionerless.box
     attributes:
       chef-server:
-        version: 12.0.5-1.el6
+        version: 12.1.2-1.el6
 
 suites:
   - name: default
@@ -34,6 +38,21 @@ suites:
       - recipe[test]
       - recipe[chef-server-populator]
     attributes:
+      chef_server_populator:
+        endpoint: localhost
+        solo_org:
+          validator_pub_key: validator_pub.pem
+        org_users:
+          pub_key: user_pub.pem
+        clients:
+          test-node: client_key_pub.pem
+  - name: default-old-chef
+    run_list:
+      - recipe[test]
+      - recipe[chef-server-populator]
+    attributes:
+      chef-server:
+        version: 12.0.7-1
       chef_server_populator:
         endpoint: localhost
         solo_org:
@@ -53,3 +72,35 @@ suites:
       chef_server_populator:
         endpoint: localhost
         databag: chef
+  - name: data-bag-old-chef
+    provisioner:
+      name: chef_zero
+    data_bags_path: test/fixtures/data_bags
+    run_list:
+      - recipe[test]
+      - recipe[chef-server-populator]
+    attributes:
+      chef-server:
+        version: 12.0.7-1
+      chef_server_populator:
+        endpoint: localhost
+        databag: chef
+  - name: backups
+    run_list:
+      - recipe[test]
+      - recipe[build-essential]
+      - recipe[chef-server-populator]
+      - recipe[chef-server-populator::backups]
+    attributes:
+      chef_server_populator:
+        endpoint: localhost
+        solo_org:
+          validator_pub_key: validator_pub.pem
+        org_users:
+          pub_key: user_pub.pem
+        clients:
+          test-node: client_key_pub.pem
+        backup:
+          remote:
+            connection: false
+            directory: false

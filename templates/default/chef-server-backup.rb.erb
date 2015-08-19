@@ -25,7 +25,7 @@ server_manifest = MultiJson.load(
 
 prefix = [
   Time.now.to_i,
-  "ver_#{server_manifest[:version]}",
+  "ver_#{server_manifest[:build_version]}",
   config[:filename]
 ].join('-')
 
@@ -75,14 +75,22 @@ remote_directory = [:remote, :directory].inject(config) do |memo, key|
   memo[key] || break
 end
 
+remote_prefix = [:remote, :file_prefix].inject(config) do |memo, key|
+  memo[key] || break
+end
+
 if(remote_creds)
   if(remote_directory)
-    remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds)
+    remote = Miasma.api(:provider => remote_creds[:provider].to_s.downcase, :type => 'storage', :credentials => remote_creds[:credentials])
     directory = remote.buckets.get(remote_directory)
     [db_file, data_file].each do |file|
       [ :date_stamped, :latest ].each do |type|
         remote_file = Miasma::Models::Storage::File.new(directory)
-        remote_file.name = type == :date_stamped ? File.basename(file) : "latest#{File.extname(file)}"
+        remote_file.name = File.join(*[
+            remote_prefix,
+            type == :date_stamped ? File.basename(file) : "latest#{File.extname(file)}"
+          ].flatten.compact
+        )
         remote_file.body = File.open(file, 'r')
         remote_file.save
       end
