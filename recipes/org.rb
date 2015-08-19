@@ -13,7 +13,11 @@ execute 'create populator user' do
 end
 
 execute 'set populator user key' do
-  command "chef-server-ctl add-user-key #{user[:name]} #{conf_dir}/#{user[:pub_key]} --key-name populator"
+  if node['chef-server'][:version].to_f >= 12.1
+  command "chef-server-ctl add-user-key #{user[:name]} --public-key-path #{conf_dir}/#{user[:pub_key]} --key-name populator"
+  else
+    command "chef-server-ctl add-user-key #{user[:name]} #{conf_dir}/#{user[:pub_key]} --key-name populator"
+  end
   not_if "chef-server-ctl list-user-keys #{user[:name]} | grep 'name: populator$'"
 end
 
