@@ -1,5 +1,4 @@
-## Unreleased
-
+## v.1.2.0
 * Adds support for both 12.0.x and 12.1.x versions, client key
   commands got a new flag which broke things.
 * Prevents randomly generated passwords from starting with a '-' which
