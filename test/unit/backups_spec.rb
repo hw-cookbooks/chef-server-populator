@@ -16,6 +16,7 @@ describe 'chef-server-populator::backups' do
       node.set[:chef_server_populator][:configuration_directory] = config_dir
       node.set[:chef_server_populator][:backup_gems] = gems
       node.set[:chef_server_populator][:backup][:schedule] = backup_schedule
+      node.set[:chef_server_populator][:backup][:remote][:connection] = {}
     end.converge(described_recipe)
   end
 
@@ -28,7 +29,9 @@ describe 'chef-server-populator::backups' do
   end
 
   it 'installs platform-specific build dependencies for transmitting backup data to a remote service' do
-    centos_chef_run = ChefSpec::SoloRunner.new(:platform => 'centos', :version => '6.5').converge(described_recipe)
+    centos_chef_run = ChefSpec::SoloRunner.new(:platform => 'centos', :version => '6.5') do |node|
+      node.set[:chef_server_populator][:backup][:remote][:connection] = {}
+    end.converge(described_recipe)
 
     apt_packages.each do |pkg|
       expect(chef_run).to install_package(pkg)
@@ -68,7 +71,7 @@ describe 'chef-server-populator::backups' do
       :command => backup_script,
       :minute => backup_schedule[:minute],
       :hour => backup_schedule[:hour],
-      :path => "$PATH:/opt/chef/embedded/bin/"
+      :path => "/opt/chef/embedded/bin/:$PATH"
     )
   end
 

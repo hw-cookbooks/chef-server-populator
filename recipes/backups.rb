@@ -12,7 +12,7 @@ when 'debian'
 when 'rhel'
   packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel patch)
 end
-  packages.each do |fog_dep|
+packages.each do |fog_dep|
 
   package fog_dep do
     only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
