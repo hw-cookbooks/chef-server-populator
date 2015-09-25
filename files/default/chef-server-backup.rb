@@ -18,14 +18,24 @@ else
   )
 end
 
-server_manifest = MultiJson.load(
-  File.read('/opt/chef-server/version-manifest.json'),
-  :symbolize_keys => true
-)
+if(File.exists?(path = '/opt/chef-server/version-manifest.json'))
+  server_manifest = MultiJson.load(
+    File.read('/opt/chef-server/version-manifest.json'),
+    :symbolize_keys => true
+  )
+  server_version = server_manifest[:version]
+elsif(File.exists?(path = '/opt/chef-server/version-manifest.txt'))
+  server_version = File.readlines('/opt/chef-server/version-manifest.txt').detect do |line|
+    line.include?('version-manifest')
+  end.to_s.split(' ').last.strip
+else
+  server_version = 'UNKNOWN'
+end
+
 
 prefix = [
   Time.now.to_i,
-  "ver_#{server_manifest[:version]}",
+  "ver_#{server_version}",
   config[:filename]
 ].join('-')
 
@@ -39,12 +49,14 @@ data_file = File.join(
   "#{prefix}.tgz"
 )
 
-# stop server
-stop_service = Mixlib::ShellOut.new('chef-server-ctl stop')
-stop_service.run_command
-stop_service.error!
-
 begin
+  # stop services that write data we're backing up
+  %w(opscode-erchef bookshelf).each do |svc|
+    stop_service = Mixlib::ShellOut.new("chef-server-ctl stop #{svc}")
+    stop_service.run_command
+    stop_service.error!
+  end
+
   backup = Mixlib::ShellOut.new([
       '/opt/chef-server/embedded/bin/pg_dump',
       "opscode_chef --username=opscode-pgsql --format=custom -f #{db_file}"
