@@ -15,13 +15,18 @@ end
   packages.each do |fog_dep|
 
   package fog_dep do
-    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
+    not_if{ node[:chef_server_populator][:backup][:remote][:connection].empty? }
   end
 end
 
-gem_package 'fog' do
-  only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
-  retries 2
+node[:chef_server_populator][:backup_gems].each_pair do |gem_name, gem_version|
+  gem_package gem_name do
+    if !gem_version.nil?
+      version gem_version
+    end
+    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
+    retries 2
+  end
 end
 
 directory node[:chef_server_populator][:configuration_directory] do
@@ -40,8 +45,8 @@ file File.join(node[:chef_server_populator][:configuration_directory], 'backup.j
   mode 0600
 end
 
-cookbook_file '/usr/local/bin/chef-server-backup' do
-  source 'chef-server-backup.rb'
+template '/usr/local/bin/chef-server-backup' do
+  source 'chef-server-backup.rb.erb'
   mode '0700'
   retries 3
 end
