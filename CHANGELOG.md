@@ -1,3 +1,7 @@
+## v0.4.2
+* Make modification of chef-server embedded runit cookbook more robust
+* Backport miasma-powered backup script from 1.0 trunk to avoid being trolled by fog installation process
+
 ## v0.4.0
 * Allow for creation of clients, users, or both
 * Store backup configuration in separate JSON file
