@@ -26,10 +26,13 @@ default[:chef_server_populator][:restore][:file] = ''
 default[:chef_server_populator][:restore][:data] = ''
 default[:chef_server_populator][:restore][:local_path] = '/tmp/'
 
+default[:chef_server_populator][:backup_gems][:miasma] = '~> 0.2'
+
 default[:chef_server_populator][:backup][:dir] = '/tmp/chef-server/backup'
 default[:chef_server_populator][:backup][:filename] = 'chef-server-full'
 default[:chef_server_populator][:backup][:remote][:connection] = {}
 default[:chef_server_populator][:backup][:remote][:directory] = nil
+default[:chef_server_populator][:backup][:remote][:file_prefix] = nil
 default[:chef_server_populator][:backup][:schedule] = {
   :minute => '33',
   :hour => '3'
