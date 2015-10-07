@@ -8,9 +8,9 @@ end
 # Include fog
 case node[:platform_family]
 when 'debian'
-  packages =  %w(gcc libxml2 libxml2-dev libxslt-dev)
+  packages =  %w(gcc g++ libxml2 libxml2-dev libxslt-dev)
 when 'rhel'
-  packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel patch)
+  packages = %w(gcc gcc-c++ libxml2 libxml2-devel libxslt libxslt-devel patch)
 end
   packages.each do |fog_dep|
 
