@@ -23,13 +23,6 @@ file '/etc/chef/client.pem' do
   action :nothing
 end
 
-ruby_block 'set admin public key' do
-  block do
-    execute_r = run_context.resource_collection.find(:execute => 'update local client')
-    execute_r.command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\""
-  end
-end
-
 execute 'backup chef server stop' do
   command 'chef-server-ctl stop erchef'
   creates '/etc/chef-server/restore.json'
@@ -72,7 +65,7 @@ execute 'restore bookshelf data' do
 end
 
 execute 'update local client' do
-  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\""
+  command lazy{ "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\"" }
   user 'opscode-pgsql'
   creates '/etc/chef-server/restore.json'
   notifies :delete, 'file[/etc/chef/client.pem]'
