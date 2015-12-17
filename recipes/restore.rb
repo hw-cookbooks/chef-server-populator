@@ -71,6 +71,13 @@ execute 'restore bookshelf data' do
   creates '/etc/chef-server/restore.json'
 end
 
+execute 'update local client' do
+  command "/opt/chef-server/embedded/bin/psql -d opscode_chef -c \"update osc_users set public_key=E'#{%x{openssl rsa -in /etc/chef-server/admin.pem -pubout}}' where username='admin'\""
+  user 'opscode-pgsql'
+  creates '/etc/chef-server/restore.json'
+  notifies :delete, 'file[/etc/chef/client.pem]'
+end
+
 execute 'restore chef server bookshelf start' do
   command 'chef-server-ctl start bookshelf'
   creates '/etc/chef-server/restore.json'
