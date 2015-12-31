@@ -31,6 +31,7 @@ describe 'chef-server-populator::configurator' do
 
       expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:nginx][:url]).to eq("https://#{endpoint}")
       expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:bookshelf][:url]).to eq("https://#{endpoint}")
+      expect(chef_run.node['chef-server'][:configuration]).to include(endpoint)
     end
   end
 
@@ -43,6 +44,7 @@ describe 'chef-server-populator::configurator' do
 
       expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:nginx][:url]).to eq("https://#{fqdn}")
       expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:bookshelf][:url]).to eq("https://#{fqdn}")
+      expect(chef_run.node['chef-server'][:configuration]).to include(fqdn)
     end
   end
 

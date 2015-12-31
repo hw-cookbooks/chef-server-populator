@@ -4,6 +4,7 @@ describe 'chef-server-populator::solo' do
   let(:server_org) { 'nasa' }
   let(:default_org) { 'endurance' }
   let(:base_path) { '/tmp/populator' }
+  let(:endpoint) { 'amazing-chef-816064413.us-west-1.elb.amazonaws.com' }
 
   let(:test_org) do
     Mash.new(
@@ -92,6 +93,17 @@ describe 'chef-server-populator::solo' do
 
   it 'creates the populator user' do
     expect(chef_run).to run_execute('create populator user')
+  end
+
+  context 'with a specified endpoint' do
+    before do
+      chef_run.node.set[:chef_server_populator][:endpoint] = endpoint
+      chef_run.converge(described_recipe)
+    end
+
+    it 'overrides the chef server endpoints to specified endpoint' do
+      expect(chef_run.node['chef-server'][:configuration]).to include(endpoint)
+    end
   end
 
   context 'when the populator user has a default key' do
