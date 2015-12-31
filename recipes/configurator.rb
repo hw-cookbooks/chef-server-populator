@@ -7,7 +7,7 @@ unless(node[:chef_server_populator][:endpoint])
 end
 
 if(node[:chef_server_populator][:endpoint])
-  node.set[:chef_server_populator][:chef_server][:api_fqdn] =
+  node.set['chef-server'][:api_fqdn] =
     node.set[:chef_server_populator][:chef_server][:configuration][:nginx][:server_name] =
     node.set[:chef_server_populator][:chef_server][:configuration][:bookshelf][:vip] =
     node.set[:chef_server_populator][:chef_server][:configuration][:lb][:api_fqdn] =
@@ -15,7 +15,7 @@ if(node[:chef_server_populator][:endpoint])
   node.set[:chef_server_populator][:chef_server][:configuration][:nginx][:url] =
     node.set[:chef_server_populator][:chef_server][:configuration][:bookshelf][:url] = "https://#{node[:chef_server_populator][:endpoint]}"
 else
-  node.set[:chef_server_populator][:chef_server][:api_fqdn] =
+  node.set['chef-server'][:api_fqdn] =
     node.set[:chef_server_populator][:chef_server][:configuration][:nginx][:server_name] =
     node.set[:chef_server_populator][:chef_server][:configuration][:bookshelf][:vip] =
     node.set[:chef_server_populator][:chef_server][:configuration][:lb][:api_fqdn] =
