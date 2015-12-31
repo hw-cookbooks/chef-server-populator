@@ -87,7 +87,7 @@ describe 'chef-server-populator::solo' do
   #
 
   it 'overrides the chef-server default_orgname' do
-    expect(chef_run.node['chef-server'][:configuration][:default_orgname]).to eq(default_org)
+    expect(chef_run.node['chef-server'][:configuration]).to include(default_org)
   end
 
   it 'creates the populator user' do
@@ -126,7 +126,7 @@ describe 'chef-server-populator::solo' do
       end
 
       it 'notifies chef-server to reconfigure immediately' do
-        expect(execute_create_populator_org).to notify('chef_server_ingredient[chef-server-core]').to(:reconfigure).immediately
+        expect(execute_create_populator_org).to notify('execute[reconfigure for populator org create]').to(:run).immediately
       end
     end
   end

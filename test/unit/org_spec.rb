@@ -53,7 +53,7 @@ describe 'chef-server-populator::org' do
   end
 
   it 'overrides the chef-server default_orgname' do
-    expect(chef_run.node['chef-server'][:configuration][:default_orgname]).to eq(default_org)
+    expect(chef_run.node['chef-server'][:configuration]).to include(default_org)
   end
 
 
@@ -84,7 +84,7 @@ describe 'chef-server-populator::org' do
       it 'notifies chef-server to reconfigure immediately' do
         chef_run.node.set[:chef_server_populator][:default_org] = test_org[:org_name]
         chef_run.converge(described_recipe)
-        expect(execute_create_populator_org).to notify('chef_server_ingredient[chef-server-core]').to(:reconfigure).immediately
+        expect(execute_create_populator_org).to notify('execute[reconfigure for populator org create]').to(:run).immediately
       end
     end
   end

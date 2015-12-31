@@ -1,3 +1,4 @@
+include_recipe 'chef-server-populator::configurator'
 include_recipe 'chef-server'
 
 conf_dir = node[:chef_server_populator][:base_path]
