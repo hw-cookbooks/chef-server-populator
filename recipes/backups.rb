@@ -13,10 +13,7 @@ when 'rhel'
   packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel patch)
 end
 packages.each do |fog_dep|
-
-  package fog_dep do
-    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
-  end
+  package fog_dep
 end
 
 node[:chef_server_populator][:backup_gems].each_pair do |gem_name, gem_version|
@@ -24,7 +21,6 @@ node[:chef_server_populator][:backup_gems].each_pair do |gem_name, gem_version|
     if !gem_version.nil?
       version gem_version
     end
-    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
     retries 2
   end
 end
