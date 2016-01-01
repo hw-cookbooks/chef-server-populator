@@ -13,10 +13,7 @@ when 'rhel'
   packages = %w(gcc libxml2 libxml2-devel libxslt libxslt-devel patch)
 end
 packages.each do |fog_dep|
-
-  package fog_dep do
-    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
-  end
+  package fog_dep
 end
 
 node[:chef_server_populator][:backup_gems].each_pair do |gem_name, gem_version|
@@ -24,7 +21,6 @@ node[:chef_server_populator][:backup_gems].each_pair do |gem_name, gem_version|
     if !gem_version.nil?
       version gem_version
     end
-    only_if{ node[:chef_server_populator][:backup][:remote][:connection] }
     retries 2
   end
 end
@@ -56,5 +52,5 @@ cron 'Chef Server Backups' do
   node[:chef_server_populator][:backup][:schedule].each do |k,v|
     send(k,v)
   end
-  path "/opt/chef/embedded/bin/:$PATH"
+  path "/opt/chef/embedded/bin/:/usr/bin:/usr/local/bin:/bin"
 end

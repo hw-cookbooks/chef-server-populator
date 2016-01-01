@@ -3,7 +3,7 @@ require_relative './spec_helper'
 describe 'chef-server-default-org' do
 
   describe file('/etc/opscode/chef-server.rb') do
-    its(:content) { should match /default_orgname "inception_llc"/ }
+    its(:content) { should match /default_orgname\("inception_llc"\)/ }
   end
 
 end

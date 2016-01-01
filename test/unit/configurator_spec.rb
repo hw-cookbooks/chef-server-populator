@@ -24,25 +24,27 @@ describe 'chef-server-populator::configurator' do
     end
 
     it 'overrides the values of a number of chef-server attributes with the specified endpoint' do
-      expect(chef_run.node['chef-server'][:configuration][:nginx][:server_name]).to eq(endpoint)
-      expect(chef_run.node['chef-server'][:configuration][:bookshelf][:vip]).to eq(endpoint)
-      expect(chef_run.node['chef-server'][:configuration][:lb][:api_fqdn]).to eq(endpoint)
-      expect(chef_run.node['chef-server'][:configuration][:lb][:web_ui_fqdn]).to eq(endpoint)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:nginx][:server_name]).to eq(endpoint)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:bookshelf][:vip]).to eq(endpoint)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:lb][:api_fqdn]).to eq(endpoint)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:lb][:web_ui_fqdn]).to eq(endpoint)
 
-      expect(chef_run.node['chef-server'][:configuration][:nginx][:url]).to eq("https://#{endpoint}")
-      expect(chef_run.node['chef-server'][:configuration][:bookshelf][:url]).to eq("https://#{endpoint}")
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:nginx][:url]).to eq("https://#{endpoint}")
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:bookshelf][:url]).to eq("https://#{endpoint}")
+      expect(chef_run.node['chef-server'][:configuration]).to include(endpoint)
     end
   end
 
   context 'without a specified endpoint' do
     it 'overrides the values of a number of chef-server attributes with the node\'s fqdn' do
-      expect(chef_run.node['chef-server'][:configuration][:nginx][:server_name]).to eq(fqdn)
-      expect(chef_run.node['chef-server'][:configuration][:bookshelf][:vip]).to eq(fqdn)
-      expect(chef_run.node['chef-server'][:configuration][:lb][:api_fqdn]).to eq(fqdn)
-      expect(chef_run.node['chef-server'][:configuration][:lb][:web_ui_fqdn]).to eq(fqdn)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:nginx][:server_name]).to eq(fqdn)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:bookshelf][:vip]).to eq(fqdn)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:lb][:api_fqdn]).to eq(fqdn)
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:lb][:web_ui_fqdn]).to eq(fqdn)
 
-      expect(chef_run.node['chef-server'][:configuration][:nginx][:url]).to eq("https://#{fqdn}")
-      expect(chef_run.node['chef-server'][:configuration][:bookshelf][:url]).to eq("https://#{fqdn}")
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:nginx][:url]).to eq("https://#{fqdn}")
+      expect(chef_run.node[:chef_server_populator][:chef_server][:configuration][:bookshelf][:url]).to eq("https://#{fqdn}")
+      expect(chef_run.node['chef-server'][:configuration]).to include(fqdn)
     end
   end
 
