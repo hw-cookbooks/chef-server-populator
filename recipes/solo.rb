@@ -1,8 +1,8 @@
-include_recipe 'chef-server-populator::configurator'
-
 if(node[:chef_server_populator][:default_org].nil?)
   node.default[:chef_server_populator][:default_org] = node[:chef_server_populator][:server_org]
 end
+
+include_recipe 'chef-server-populator::configurator'
 
 # if backup pull files include restore
 
