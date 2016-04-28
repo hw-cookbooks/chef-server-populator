@@ -10,6 +10,7 @@ end
 describe "NO OPs" do
 
   describe command('chef-server-ctl user-list') do
+    its(:stdout) { should_not match /keyless-user/ }
     its(:stdout) { should_not match /non-chef-user/ }
   end
 

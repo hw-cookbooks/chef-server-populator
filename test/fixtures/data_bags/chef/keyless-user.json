@@ -1,0 +1,17 @@
+{
+  "id": "keyless-user",
+  "chef_server": {
+    "client_key": "",
+    "full_name": "Keyless User",
+    "email": "keylessuser@example.com",
+    "type": [
+      "user"
+    ],
+    "orgs": {
+      "inception_llc": {
+        "enabled": true,
+        "admin": true
+      }
+    }
+  }
+}
