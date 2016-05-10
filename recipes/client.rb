@@ -49,7 +49,7 @@ if(node[:chef_server_populator][:databag])
           end
         end
         execute "add org validator key: #{item['client']}" do
-          if node['chef-server'][:version].to_f >= 12.1
+          if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
           command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator --public-key-path #{key_file} --key-name populator"
           else
             command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator #{key_file} --key-name populator"
@@ -103,7 +103,7 @@ if(node[:chef_server_populator][:databag])
         end
         if(item['pub_key'])
           execute "set user key: #{item['client']}" do
-            if node['chef-server'][:version].to_f >= 12.1
+            if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
               command "chef-server-ctl add-user-key #{item['client']} --public-key-path #{key_file} --key-name populator"
             else
               command "chef-server-ctl add-user-key #{item['client']} #{key_file} --key-name populator"
@@ -158,7 +158,7 @@ if(node[:chef_server_populator][:databag])
         end
         if(item['pub_key'])
           execute "set client key: #{item['client']}" do
-            if node['chef-server'][:version].to_f >= 12.1
+            if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
               command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} --public-key-path #{key_file} --key-name populator"
             else
               command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} #{key_file} --key-name populator"

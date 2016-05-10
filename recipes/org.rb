@@ -13,7 +13,7 @@ execute 'create populator user' do
 end
 
 execute 'set populator user key' do
-  if node['chef-server'][:version].to_f >= 12.1
+  if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
   command "chef-server-ctl add-user-key #{user[:name]} --public-key-path #{conf_dir}/#{user[:pub_key]} --key-name populator"
   else
     command "chef-server-ctl add-user-key #{user[:name]} #{conf_dir}/#{user[:pub_key]} --key-name populator"
@@ -40,7 +40,7 @@ execute 'create populator org' do
 end
 
 execute 'add populator org validator key' do
-  if node['chef-server'][:version].to_f >= 12.1
+  if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
     command "chef-server-ctl add-client-key #{org[:org_name]} #{org[:org_name]}-validator --public-key-path #{conf_dir}/#{org[:validator_pub_key]} --key-name populator"
   else
     command "chef-server-ctl add-client-key #{org[:org_name]} #{org[:org_name]}-validator #{conf_dir}/#{org[:validator_pub_key]} --key-name populator"

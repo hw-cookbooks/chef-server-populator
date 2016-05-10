@@ -4,4 +4,4 @@ maintainer 'Heavywater'
 maintainer_email 'support@hw-ops.com'
 version '2.0.1'
 
-depends 'chef-server', '~> 4.0'
+depends 'chef-server', '~> 5.0'

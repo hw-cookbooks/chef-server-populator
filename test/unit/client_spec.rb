@@ -100,7 +100,7 @@ describe 'chef-server-populator::client' do
 
       it 'adds the organziation validator key' do
         expect(chef_run).to run_execute('add org validator key: nasa').with(
-          :command => "chef-server-ctl add-client-key nasa nasa-validator #{Chef::Config[:file_cache_path]}/nasa.pub --key-name populator"
+          :command => "chef-server-ctl add-client-key nasa nasa-validator --public-key-path #{Chef::Config[:file_cache_path]}/nasa.pub --key-name populator"
         )
       end
 
@@ -134,7 +134,7 @@ describe 'chef-server-populator::client' do
 
         it 'sets inserts the client key as the user\'s populator key' do
           expect(chef_run).to run_execute("set user key: #{test_user_name}").with(
-            :command => "chef-server-ctl add-user-key #{test_user_name} #{test_user_pub_key_path} --key-name populator"
+            :command => "chef-server-ctl add-user-key #{test_user_name} --public-key-path #{test_user_pub_key_path} --key-name populator"
           )
         end
 
