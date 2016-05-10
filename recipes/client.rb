@@ -18,7 +18,7 @@ if(node[:chef_server_populator][:databag])
         Chef::Log.info("No chef-server data for #{bag_item['id']}")
       end
       item.merge('client' => data_bag_item(node[:chef_server_populator][:databag], bag_item)['id'],
-                 'pub_key' => item['client_key'] ,
+                 'pub_key' => item['client_key'],
                  'enabled' => item['enabled'],
                  'admin' => item.fetch('admin', false),
                  'password' => item.fetch('password', SecureRandom.urlsafe_base64(23).gsub(/^\-*/,'')),
