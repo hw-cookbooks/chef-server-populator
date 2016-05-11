@@ -1,4 +1,13 @@
+# chef-server-populator CHANGELOG
+
 ## Unreleased changes
+
+## v2.0.2
+* Configure $PATH to fix backups unit test
+* Don't create users if no public key is set
+* Use correct client-key flag when no version is set
+* Update chef-server dependency b/c packagecloud repos are gone
+* Add Nellie for CI
 
 ## v2.0.0
 * Support chef-server 4.x versions
