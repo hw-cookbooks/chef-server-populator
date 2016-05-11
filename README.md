@@ -33,7 +33,7 @@ Applicable attributes:
 
 Structure of the data bag item:
 
-User: 
+User:
 ```json
 {
   "id": "user_name",
@@ -49,7 +49,8 @@ User:
         "enabled": true,
         "admin": true
       }
-   } 
+    }
+  }
 }
 ```
 Note: While users can belong to multiple organizations, and the above
@@ -67,7 +68,7 @@ Client:
       "client"
     ],
     "orgs": [ "organization" ]
-   } 
+   }
 }
 ```
 Note: If no organization is specified for a client, it will be added
@@ -89,7 +90,7 @@ Org:
   }
 }
 ```
-Note: Creating the org will create a client called `<org>-validator` which uses the public key specified when 
+Note: Creating the org will create a client called `<org>-validator` which uses the public key specified when
 creating the org.
 In addition, there is currently a bug in Chef server 12.1 which means only the first word in
 the full name will be used, as the option is not parsed correctly
