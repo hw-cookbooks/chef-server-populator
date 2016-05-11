@@ -86,37 +86,37 @@ if(node[:chef_server_populator][:databag])
         end
       elsif(item['enabled'] == true)
         if(item['pub_key'])
-          key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
-          file key_file do
-            backup false
-            content item['pub_key']
-            mode '0400'
-          end
-        end
-        item['full_name'] = item.fetch('full_name', item['client'].capitalize)
-        first_name = item['full_name'].split(' ').first.capitalize
-        last_name = item['full_name'].split(' ').last.capitalize
-        email = item.fetch('email', "#{item['client']}@example.com")
-        execute "create user: #{item['client']}" do
-          command "chef-server-ctl user-create #{item['client']} #{first_name} #{last_name} #{email} #{item['password']} > /dev/null 2>&1"
-          not_if "chef-server-ctl user-list | grep '^#{item['client']}$'"
-        end
-        if(item['pub_key'])
-          execute "set user key: #{item['client']}" do
-            if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
-              command "chef-server-ctl add-user-key #{item['client']} --public-key-path #{key_file} --key-name populator"
-            else
-              command "chef-server-ctl add-user-key #{item['client']} #{key_file} --key-name populator"
+          unless item['pub_key'].to_s.empty?
+            key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
+            file key_file do
+              backup false
+              content item['pub_key']
+              mode '0400'
             end
-            not_if "chef-server-ctl list-user-keys #{item['client']} | grep 'name: populator$'"
+            item['full_name'] = item.fetch('full_name', item['client'].capitalize)
+            first_name = item['full_name'].split(' ').first.capitalize
+            last_name = item['full_name'].split(' ').last.capitalize
+            email = item.fetch('email', "#{item['client']}@example.com")
+            execute "create user: #{item['client']}" do
+              command "chef-server-ctl user-create #{item['client']} #{first_name} #{last_name} #{email} #{item['password']} > /dev/null 2>&1"
+              not_if "chef-server-ctl user-list | grep '^#{item['client']}$'"
+            end
+            execute "set user key: #{item['client']}" do
+              if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
+                command "chef-server-ctl add-user-key #{item['client']} --public-key-path #{key_file} --key-name populator"
+              else
+                command "chef-server-ctl add-user-key #{item['client']} #{key_file} --key-name populator"
+              end
+              not_if "chef-server-ctl list-user-keys #{item['client']} | grep 'name: populator$'"
+            end
+            execute "delete default user key: #{item['client']}" do
+              command "chef-server-ctl delete-user-key #{item['client']} default"
+              only_if "chef-server-ctl list-user-keys #{item['client']} | grep 'name: default$'"
+            end
+            execute "set user org: #{item['client']}" do
+              command "chef-server-ctl org-user-add #{item['org']} #{item['client']} #{'--admin' if item['admin']}"
+            end
           end
-          execute "delete default user key: #{item['client']}" do
-            command "chef-server-ctl delete-user-key #{item['client']} default"
-            only_if "chef-server-ctl list-user-keys #{item['client']} | grep 'name: default$'"
-          end
-        end
-        execute "set user org: #{item['client']}" do
-          command "chef-server-ctl org-user-add #{item['org']} #{item['client']} #{'--admin' if item['admin']}"
         end
       end
     end
