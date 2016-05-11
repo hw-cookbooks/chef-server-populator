@@ -19,6 +19,25 @@ describe 'chef-server-populator::client' do
         'full_name' => 'Murphy Cooper',
         'enabled' => true,
         'password' => 'vHeBu6baW4PXIKVNDsE-APweIVpdLLU',
+        'client_key' => "a-non-empty-rsa-key",
+        'type' => ['user'],
+        'orgs' => {
+          'nasa' => {
+            'enabled' => true,
+            'admin' => true
+          }
+        }
+      }
+    )
+  }
+  let(:keyless_user_name) { 'amelia' }
+  let(:keyless_user_item) {
+    Mash.new(
+      'chef_server' => {
+        'email' => 'ameliabrand@nasa.gov',
+        'full_name' => 'Amelia Brand',
+        'enabled' => true,
+        'password' => 'vHeBu6baW4PXIKVNDsE-APweIVpdLLU',
         'client_key' => "",
         'type' => ['user'],
         'orgs' => {
@@ -118,13 +137,12 @@ describe 'chef-server-populator::client' do
 
   context 'a user is defined in the data bag' do
     context 'the user is enabled' do
-      it 'creates the user' do
-        expect(chef_run).to run_execute("create user: #{test_user_name}").with(
-          :command => "chef-server-ctl user-create #{test_user_name} #{test_user_item['chef_server']['full_name'].split(' ').first} #{test_user_item['chef_server']['full_name'].split(' ').last} #{test_user_item['chef_server']['email']} #{test_user_item['chef_server']['password']} > /dev/null 2>&1"
-        )
-      end
-
       context 'the user has a client key specified' do
+        it 'creates the user' do
+          expect(chef_run).to run_execute("create user: #{test_user_name}").with(
+            :command => "chef-server-ctl user-create #{test_user_name} #{test_user_item['chef_server']['full_name'].split(' ').first} #{test_user_item['chef_server']['full_name'].split(' ').last} #{test_user_item['chef_server']['email']} #{test_user_item['chef_server']['password']} > /dev/null 2>&1"
+          )
+        end
 
         it 'creates the user\'s client key file' do
           expect(chef_run).to create_file(test_user_pub_key_path).with(
@@ -144,6 +162,12 @@ describe 'chef-server-populator::client' do
       end
 
       context 'the user has an org specified' do
+      end
+    end
+
+    context 'the user does not have a client key specified' do
+      it 'skips the user' do
+        expect(chef_run).to_not run_execute("create user: #{keyless_user_name}")
       end
     end
   end
