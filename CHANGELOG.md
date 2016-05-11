@@ -1,3 +1,5 @@
+# chef-server-populator CHANGELOG
+
 ## Unreleased changes
 
 ## v2.0.2
