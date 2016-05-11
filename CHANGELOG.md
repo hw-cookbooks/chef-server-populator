@@ -1,3 +1,5 @@
+## Unreleased changes
+
 ## v2.0.0
 * Support chef-server 4.x versions
 * Make chef-server constraint tighter to prevent breakage

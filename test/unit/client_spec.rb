@@ -19,6 +19,25 @@ describe 'chef-server-populator::client' do
         'full_name' => 'Murphy Cooper',
         'enabled' => true,
         'password' => 'vHeBu6baW4PXIKVNDsE-APweIVpdLLU',
+        'client_key' => "a-non-empty-rsa-key",
+        'type' => ['user'],
+        'orgs' => {
+          'nasa' => {
+            'enabled' => true,
+            'admin' => true
+          }
+        }
+      }
+    )
+  }
+  let(:keyless_user_name) { 'amelia' }
+  let(:keyless_user_item) {
+    Mash.new(
+      'chef_server' => {
+        'email' => 'ameliabrand@nasa.gov',
+        'full_name' => 'Amelia Brand',
+        'enabled' => true,
+        'password' => 'vHeBu6baW4PXIKVNDsE-APweIVpdLLU',
         'client_key' => "",
         'type' => ['user'],
         'orgs' => {
@@ -100,7 +119,7 @@ describe 'chef-server-populator::client' do
 
       it 'adds the organziation validator key' do
         expect(chef_run).to run_execute('add org validator key: nasa').with(
-          :command => "chef-server-ctl add-client-key nasa nasa-validator #{Chef::Config[:file_cache_path]}/nasa.pub --key-name populator"
+          :command => "chef-server-ctl add-client-key nasa nasa-validator --public-key-path #{Chef::Config[:file_cache_path]}/nasa.pub --key-name populator"
         )
       end
 
@@ -118,13 +137,12 @@ describe 'chef-server-populator::client' do
 
   context 'a user is defined in the data bag' do
     context 'the user is enabled' do
-      it 'creates the user' do
-        expect(chef_run).to run_execute("create user: #{test_user_name}").with(
-          :command => "chef-server-ctl user-create #{test_user_name} #{test_user_item['chef_server']['full_name'].split(' ').first} #{test_user_item['chef_server']['full_name'].split(' ').last} #{test_user_item['chef_server']['email']} #{test_user_item['chef_server']['password']} > /dev/null 2>&1"
-        )
-      end
-
       context 'the user has a client key specified' do
+        it 'creates the user' do
+          expect(chef_run).to run_execute("create user: #{test_user_name}").with(
+            :command => "chef-server-ctl user-create #{test_user_name} #{test_user_item['chef_server']['full_name'].split(' ').first} #{test_user_item['chef_server']['full_name'].split(' ').last} #{test_user_item['chef_server']['email']} #{test_user_item['chef_server']['password']} > /dev/null 2>&1"
+          )
+        end
 
         it 'creates the user\'s client key file' do
           expect(chef_run).to create_file(test_user_pub_key_path).with(
@@ -134,7 +152,7 @@ describe 'chef-server-populator::client' do
 
         it 'sets inserts the client key as the user\'s populator key' do
           expect(chef_run).to run_execute("set user key: #{test_user_name}").with(
-            :command => "chef-server-ctl add-user-key #{test_user_name} #{test_user_pub_key_path} --key-name populator"
+            :command => "chef-server-ctl add-user-key #{test_user_name} --public-key-path #{test_user_pub_key_path} --key-name populator"
           )
         end
 
@@ -144,6 +162,12 @@ describe 'chef-server-populator::client' do
       end
 
       context 'the user has an org specified' do
+      end
+    end
+
+    context 'the user does not have a client key specified' do
+      it 'skips the user' do
+        expect(chef_run).to_not run_execute("create user: #{keyless_user_name}")
       end
     end
   end

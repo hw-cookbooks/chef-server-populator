@@ -71,7 +71,7 @@ describe 'chef-server-populator::backups' do
       :command => backup_script,
       :minute => backup_schedule[:minute],
       :hour => backup_schedule[:hour],
-      :path => "/opt/chef/embedded/bin/:$PATH"
+      :path => "/opt/chef/embedded/bin/:/usr/bin:/usr/local/bin:/bin"
     )
   end
 
