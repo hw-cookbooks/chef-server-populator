@@ -12,7 +12,7 @@ describe 'backups-configured' do
   describe file('/etc/chef-server/populator/backup.json') do
     it { should be_file }
     it { should be_owned_by 'root' }
-    its(:content) { should match /"dir": "\/tmp\/chef-server\/backup"/ }
+    its(:content) { should match %r{"dir": "/tmp/chef-server/backup"} }
     its(:content) { should match /"filename": "chef-server-full"/ }
     it { should be_readable.by('owner') }
   end
