@@ -31,28 +31,28 @@ default[:chef_server_populator][:backup][:remote][:connection] = nil
 default[:chef_server_populator][:backup][:remote][:directory] = nil
 default[:chef_server_populator][:backup][:remote][:file_prefix] = nil
 default[:chef_server_populator][:backup][:schedule] = {
-  :minute => '33',
-  :hour => '3'
+  minute: '33',
+  hour: '3',
 }
 
-#The following attributes are provided as examples. In almost every
-#imaginable case you will want to replace some or all of these with
-#your own values.
+# The following attributes are provided as examples. In almost every
+# imaginable case you will want to replace some or all of these with
+# your own values.
 
 default[:chef_server_populator][:solo_org] = {
-  :org_name => 'inception_llc',
-  :full_name => 'Chef Inception Organization',
-  :validator_pub_key => 'validator_pub.pem'
+  org_name: 'inception_llc',
+  full_name: 'Chef Inception Organization',
+  validator_pub_key: 'validator_pub.pem',
 }
 
 default[:chef_server_populator][:solo_org_user] = {
-  :name => 'populator',
-  :first => 'Populator',
-  :last => 'User',
-  :email => 'pop@example.com',
-  :pub_key => 'user_pub.pem'
+  name: 'populator',
+  first: 'Populator',
+  last: 'User',
+  email: 'pop@example.com',
+  pub_key: 'user_pub.pem',
 }
 
 default[:chef_server_populator][:server_org] = 'inception_llc'
-#If this is set to nil, the configurator recipe will set it to the server_org.
+# If this is set to nil, the configurator recipe will set it to the server_org.
 default[:chef_server_populator][:default_org] = nil

@@ -1,6 +1,6 @@
 include_recipe 'chef-server-populator::configurator'
 
-knife_cmd = "#{node[:chef_server_populator][:knife_exec]}"
+knife_cmd = "#{node['chef_server_populator']['knife_exec']}"
 knife_opts = '-c /etc/opscode/pivotal.rb'
 
 ssl_port = %w(chef-server configuration nginx ssl_port).inject(node) do |memo, key|
@@ -8,20 +8,20 @@ ssl_port = %w(chef-server configuration nginx ssl_port).inject(node) do |memo, k
 end
 ssl_port = ":#{ssl_port}" if ssl_port
 
-pg_cmd = "/opt/chef-server/embedded/bin/psql -d opscode_chef"
+pg_cmd = '/opt/chef-server/embedded/bin/psql -d opscode_chef'
 
-if(node[:chef_server_populator][:databag])
+if node['chef_server_populator']['databag']
   begin
-    items = data_bag(node[:chef_server_populator][:databag]).map do |bag_item|
-      item = data_bag_item(node[:chef_server_populator][:databag], bag_item).fetch('chef_server', {})
+    items = data_bag(node['chef_server_populator']['databag']).map do |bag_item|
+      item = data_bag_item(node['chef_server_populator']['databag'], bag_item).fetch('chef_server', {})
       if item.empty?
         Chef::Log.info("No chef-server data for #{bag_item['id']}")
       end
-      item.merge('client' => data_bag_item(node[:chef_server_populator][:databag], bag_item)['id'],
+      item.merge('client' => data_bag_item(node['chef_server_populator']['databag'], bag_item)['id'],
                  'pub_key' => item['client_key'],
                  'enabled' => item['enabled'],
                  'admin' => item.fetch('admin', false),
-                 'password' => item.fetch('password', SecureRandom.urlsafe_base64(23).gsub(/^\-*/,'')),
+                 'password' => item.fetch('password', SecureRandom.urlsafe_base64(23).gsub(/^\-*/, '')),
                  'orgs' => item.fetch('orgs', {}))
     end
     orgs = items.select { |item| item.fetch('type', []).include?('org') }
@@ -30,17 +30,17 @@ if(node[:chef_server_populator][:databag])
 
     # Org Setup
     orgs.each do |item|
-      if(item['enabled']==true)
+      if item['enabled'] == true
         item['full_name'] = item.fetch('full_name', item['client'].capitalize)
         execute "create org: #{item['client']}" do
           item.merge('full_name' => item.fetch('full_name', item['client'].capitalize))
           command "chef-server-ctl org-create #{item['client']} #{item['full_name']}"
           not_if "chef-server-ctl org-list | grep '^#{item['client']}$'"
-          if item['client'] == node[:chef_server_populator][:default_org]
+          if item['client'] == node['chef_server_populator']['default_org']
             notifies :reconfigure, 'chef_server_ingredient[chef-server-core]', :immediately
           end
         end
-        if(item['pub_key'])
+        if item['pub_key']
           key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
           file key_file do
             backup false
@@ -49,8 +49,8 @@ if(node[:chef_server_populator][:databag])
           end
         end
         execute "add org validator key: #{item['client']}" do
-          if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
-          command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator --public-key-path #{key_file} --key-name populator"
+          if node['chef-server']['version'].to_f >= 12.1 || node['chef-server']['version'].to_f == 0.0
+            command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator --public-key-path #{key_file} --key-name populator"
           else
             command "chef-server-ctl add-client-key #{item['client']} #{item['client']}-validator #{key_file} --key-name populator"
           end
@@ -68,15 +68,15 @@ if(node[:chef_server_populator][:databag])
     users.each do |item|
       org, options = item['orgs'].first
       item['org'] = org
-      if(options)
-        if(options.has_key?('enabled'))
+      if options
+        if options.has_key?('enabled')
           item['enabled'] = options['enabled']
         end
-        if(options.has_key?('admin'))
+        if options.has_key?('admin')
           item['admin'] = options['admin']
         end
       end
-      if(item['enabled'] == false)
+      if item['enabled'] == false
         execute "remove user: #{item['client']} from #{item['org']}" do
           command "chef-server-ctl org-user-remove #{item['org']} #{item['client']}"
         end
@@ -84,8 +84,8 @@ if(node[:chef_server_populator][:databag])
           command "chef-server-ctl user-delete #{item['client']}"
           only_if "chef-server-list user-list | tr -d ' ' | grep '^#{item['client']}$'"
         end
-      elsif(item['enabled'] == true)
-        if(item['pub_key'])
+      elsif item['enabled'] == true
+        if item['pub_key']
           unless item['pub_key'].to_s.empty?
             key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
             file key_file do
@@ -102,7 +102,7 @@ if(node[:chef_server_populator][:databag])
               not_if "chef-server-ctl user-list | grep '^#{item['client']}$'"
             end
             execute "set user key: #{item['client']}" do
-              if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
+              if node['chef-server']['version'].to_f >= 12.1 || node['chef-server']['version'].to_f == 0.0
                 command "chef-server-ctl add-user-key #{item['client']} --public-key-path #{key_file} --key-name populator"
               else
                 command "chef-server-ctl add-user-key #{item['client']} #{key_file} --key-name populator"
@@ -123,27 +123,27 @@ if(node[:chef_server_populator][:databag])
     # Client Setup
     clients.each do |item|
       org, options = item['orgs'].first
-      if(org)
-        knife_url = "-s https://127.0.0.1/organizations/#{org}"
-      else
-        knife_url = "-s https://127.0.0.1"
-      end
-      if(options)
-        if(options.has_key?('enabled'))
+      knife_url = if org
+                    "-s https://127.0.0.1/organizations/#{org}"
+                  else
+                    '-s https://127.0.0.1'
+                  end
+      if options
+        if options.has_key?('enabled')
           item[:enabled] = options[:enabled]
         end
-        if(options.has_key?('admin'))
+        if options.has_key?('admin')
           item[:admin] = options[:admin]
         end
       end
-      if(item['enabled'] == false)
+      if item['enabled'] == false
         execute "delete client: #{item['client']}" do
           command "#{knife_cmd} client delete #{item['client']} -d #{knife_opts} #{knife_url}"
           only_if "#{knife_cmd} client list #{knife_opts} #{knife_url} | tr -d ' ' | grep '^#{item['client']}$'"
           retries 10
         end
       else
-        if(item['pub_key'])
+        if item['pub_key']
           key_file = "#{Chef::Config[:file_cache_path]}/#{item['client']}.pub"
           file key_file do
             backup false
@@ -156,18 +156,18 @@ if(node[:chef_server_populator][:databag])
           not_if "#{knife_cmd} client list #{knife_url} #{knife_opts} | tr -d ' ' | grep '^#{item['client']}$'"
           retries 10
         end
-        if(item['pub_key'])
+        if item['pub_key']
           execute "set client key: #{item['client']}" do
-            if (node['chef-server'][:version].to_f >= 12.1 || node['chef-server'][:version].to_f == 0.0)
-              command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} --public-key-path #{key_file} --key-name populator"
+            if node['chef-server']['version'].to_f >= 12.1 || node['chef-server']['version'].to_f == 0.0
+              command "chef-server-ctl add-client-key #{org || node['chef_server_populator']['default_org']} #{item['client']} --public-key-path #{key_file} --key-name populator"
             else
-              command "chef-server-ctl add-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} #{key_file} --key-name populator"
+              command "chef-server-ctl add-client-key #{org || node['chef_server_populator']['default_org']} #{item['client']} #{key_file} --key-name populator"
             end
-              not_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{item['client']} | grep 'name: populator$'"
+            not_if "chef-server-ctl list-client-keys #{org || node['chef_server_populator']['default_org']} #{item['client']} | grep 'name: populator$'"
           end
           execute "delete default client key: #{item['client']}" do
-            command "chef-server-ctl delete-client-key #{org || node[:chef_server_populator][:default_org]} #{item['client']} default"
-            only_if "chef-server-ctl list-client-keys #{org || node[:chef_server_populator][:default_org]} #{item['client']} | grep 'name: default$'"
+            command "chef-server-ctl delete-client-key #{org || node['chef_server_populator']['default_org']} #{item['client']} default"
+            only_if "chef-server-ctl list-client-keys #{org || node['chef_server_populator']['default_org']} #{item['client']} | grep 'name: default$'"
           end
         end
       end

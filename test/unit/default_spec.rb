@@ -27,10 +27,9 @@ describe 'chef-server-populator::default' do
 
   context 'when provided values for restore file attribute' do
     it 'includes restore recipe' do
-      chef_solo_run.node.set[:chef_server_populator][:restore][:file] = '/tmp/latest.tgz'
+      chef_solo_run.node.normal['chef_server_populator']['restore'][:file] = '/tmp/latest.tgz'
       expect_any_instance_of(Chef::Recipe).to receive(:include_recipe).with('chef-server-populator::restore')
       chef_solo_run.converge(described_recipe)
     end
   end
-
 end
